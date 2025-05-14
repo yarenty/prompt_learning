@@ -1,6 +1,6 @@
 # System Prompt Learning Framework
 
-A framework for enhancing AI problem-solving capabilities through system prompt learning, using Ollama instead of OpenAI.
+A framework for enhancing AI problem-solving capabilities through system prompt learning, using local Ollama.
 
 ## Project Structure
 
