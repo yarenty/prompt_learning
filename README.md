@@ -31,11 +31,21 @@ This project implements a framework for learning and evolving system prompts thr
    - Baseline comparisons
 
 ## Setup
+0. Get ollama and model
+```
+ollama pull codellama
+```
 
 1. Create a virtual environment:
 ```bash
 python -m venv venv
+# or
+uv venv
+
 source venv/bin/activate  # On Unix/macOS
+# or 
+source venv/bin/activate.fish  # On Unix/macOS - fish shell
+
 # or
 .\venv\Scripts\activate  # On Windows
 ```
@@ -43,6 +53,9 @@ source venv/bin/activate  # On Unix/macOS
 2. Install dependencies:
 ```bash
 pip install -r requirements.txt
+# or 
+uv init
+uv add -r requirements.txt
 ```
 
 3. Set up environment variables:
