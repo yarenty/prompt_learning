@@ -7,37 +7,36 @@ from datetime import datetime
 from pathlib import Path
 from typing import Dict, List
 
-from feedback_loop.collector import FeedbackCollector
-from prompt_integration.processor import PromptProcessor
+from prompt_evolution.learner import PromptLearner
 from examples.problems import get_all_problems
 from examples.system_prompts import get_all_prompts
 from examples.logger import logger
-from tqdm import tqdm
-import time
 
 def log_evaluation(evaluation: dict, criteria: list):
     """Log detailed evaluation results."""
     logger.info("Evaluation Results:")
     logger.info("-" * 30)
     for criterion in criteria:
-        score = evaluation.get(criterion, 0)
-        logger.info(f"{criterion:<15}: {score:.2f}")
+        if criterion in evaluation:
+            data = evaluation[criterion]
+            if isinstance(data, dict):
+                score = data.get("score", 0.0)
+                explanation = data.get("explanation", "")
+                logger.info(f"{criterion:<15}: {score:.2f}")
+                logger.info(f"Explanation: {explanation}")
+            else:
+                logger.info(f"{criterion:<15}: {data}")
     logger.info("-" * 30)
 
-def log_reflection(reflection: str):
-    """Log reflection with formatting."""
-    logger.info("\nReflection:")
-    logger.info("-" * 30)
-    logger.info(reflection)
-    logger.info("-" * 30)
-
-def log_insights(insights: list):
-    """Log extracted insights with detailed information."""
-    logger.info("\nExtracted Insights:")
+def log_lessons(lessons: List[Dict]):
+    """Log lessons learned from evaluation."""
+    logger.info("\nLessons Learned:")
     logger.info("=" * 50)
-    for insight in insights:
-        logger.info(f"\nInsight: {insight['insight']}")
-        logger.info(f"Support Count: {insight['support_count']}")
+    for lesson in lessons:
+        logger.info(f"\nCriterion: {lesson['criterion']}")
+        logger.info(f"Score: {lesson['score']:.2f}")
+        logger.info(f"Explanation: {lesson['explanation']}")
+        logger.info(f"Lesson: {lesson['lesson']}")
         logger.info("-" * 30)
 
 def log_prompt_evolution(current_prompt: str, updated_prompt: str):
@@ -69,9 +68,9 @@ async def run_problems_with_prompt(initial_prompt: str, prompt_type: str):
     logger.info(f"Starting evaluation with prompt type: {prompt_type}")
     logger.info(f"{'='*50}\n")
     
-    # Initialize components
-    feedback_collector = FeedbackCollector()
-    prompt_processor = PromptProcessor()
+    # Initialize prompt learner
+    learner = PromptLearner(initial_prompts={prompt_type: initial_prompt})
+    current_prompt = initial_prompt
     
     # Get all problems
     problems = get_all_problems()
@@ -92,43 +91,55 @@ async def run_problems_with_prompt(initial_prompt: str, prompt_type: str):
         logger.info("=" * 50)
         logger.info(f"Description: {problem['description']}")
         
-        # Collect feedback
-        feedback = feedback_collector.collect_solution_feedback(
-            problem=problem['description'],
-            solution=problem['solution'],
+        # Evaluate prompt performance
+        evaluation_result = learner.evaluate_prompt_performance(
+            prompt=current_prompt,
+            problem=problem,
             evaluation_criteria=criteria
         )
         
         # Log evaluation results
-        log_evaluation(feedback['evaluation'], criteria)
+        log_evaluation(evaluation_result['evaluation'], criteria)
         
-        # Log reflection
-        log_reflection(feedback['reflection'])
+        # Log lessons learned
+        log_lessons(evaluation_result['lessons'])
         
-        # Process feedback and update system prompt
-        insights = prompt_processor.process_feedback()
-        updated_prompt = prompt_processor.update_system_prompt(insights)
-        
-        # Log insights
-        log_insights(insights)
+        # Evolve prompt based on lessons
+        updated_prompt = learner.evolve_prompt(
+            current_prompt=current_prompt,
+            lessons=evaluation_result['lessons']
+        )
         
         # Log prompt evolution
-        current_prompt = prompt_processor._load_current_prompt()
         log_prompt_evolution(current_prompt, updated_prompt)
+        
+        # Save evolution step
+        learner.save_evolution_step(
+            prompt_type=prompt_type,
+            current_prompt=current_prompt,
+            updated_prompt=updated_prompt,
+            evaluation_results=[evaluation_result]
+        )
+        
+        # Update current prompt for next iteration
+        current_prompt = updated_prompt
         
         # Add delay to avoid rate limiting
         await asyncio.sleep(1)
+    
+    # Get final evolution history
+    evolution_history = learner.get_evolution_history(prompt_type)
     
     # Save run information
     run_info = {
         "timestamp": datetime.now().isoformat(),
         "prompt_type": prompt_type,
         "initial_prompt": initial_prompt,
-        "final_prompt": prompt_processor._load_current_prompt(),
+        "final_prompt": current_prompt,
         "problems_evaluated": len(problems),
-        "insights_generated": len(insights),
+        "evolution_steps": len(evolution_history),
         "evaluation_criteria": criteria,
-        "final_insights": insights
+        "evolution_history": evolution_history
     }
     
     # Create logs directory if it doesn't exist
