@@ -81,6 +81,11 @@ python -m feedback_loop.collect
 python -m prompt_integration.process
 ```
 
+4. More problems
+```bash
+python -m examples.run_problems
+```
+
 ## Contributing
 
 This is a research project exploring system prompt learning. Contributions and ideas are welcome! 
