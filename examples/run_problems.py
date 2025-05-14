@@ -1,22 +1,27 @@
 """
 Script to run example problems through the system prompt learning framework.
 """
+import asyncio
+import json
+from datetime import datetime
+from pathlib import Path
+from typing import Dict, List
+
 from feedback_loop.collector import FeedbackCollector
 from prompt_integration.processor import PromptProcessor
 from examples.problems import get_all_problems
+from examples.system_prompts import get_all_prompts
 from examples.logger import logger
 from tqdm import tqdm
 import time
-import json
-from datetime import datetime
 
 def log_evaluation(evaluation: dict, criteria: list):
     """Log detailed evaluation results."""
-    logger.info("\nEvaluation Results:")
+    logger.info("Evaluation Results:")
     logger.info("-" * 30)
     for criterion in criteria:
-        score = evaluation.get(criterion, 0.0)
-        logger.info(f"{criterion:15} : {score:.2f}")
+        score = evaluation.get(criterion, 0)
+        logger.info(f"{criterion:<15}: {score:.2f}")
     logger.info("-" * 30)
 
 def log_reflection(reflection: str):
@@ -27,14 +32,13 @@ def log_reflection(reflection: str):
     logger.info("-" * 30)
 
 def log_insights(insights: list):
-    """Log insights with detailed information."""
+    """Log extracted insights with detailed information."""
     logger.info("\nExtracted Insights:")
     logger.info("=" * 50)
     for insight in insights:
-        logger.info(f"\nInsight #{insight['cluster_id']}")
+        logger.info(f"\nInsight: {insight['text']}")
         logger.info(f"Support Count: {insight['support_count']}")
-        logger.info("-" * 30)
-        logger.info(insight['insight'])
+        logger.info(f"Confidence: {insight['confidence']:.2f}")
         logger.info("-" * 30)
 
 def log_prompt_evolution(current_prompt: str, updated_prompt: str):
@@ -42,32 +46,39 @@ def log_prompt_evolution(current_prompt: str, updated_prompt: str):
     logger.info("\nSystem Prompt Evolution:")
     logger.info("=" * 50)
     
-    # Log the changes
+    # Find new lines in the updated prompt
     current_lines = set(current_prompt.split('\n'))
     updated_lines = set(updated_prompt.split('\n'))
+    new_lines = updated_lines - current_lines
     
-    added_lines = updated_lines - current_lines
-    if added_lines:
+    if new_lines:
         logger.info("\nNew Insights Added:")
-        for line in added_lines:
+        for line in new_lines:
             if line.strip():
                 logger.info(f"+ {line}")
+    else:
+        logger.info("\nNo new insights added in this iteration")
     
     logger.info("\nFull Updated Prompt:")
-    logger.info("=" * 50)
+    logger.info("-" * 30)
     logger.info(updated_prompt)
+    logger.info("-" * 30)
 
-def run_problems():
+async def run_problems_with_prompt(initial_prompt: str, prompt_type: str):
+    """Run problems with a specific initial prompt."""
+    logger.info(f"\n{'='*50}")
+    logger.info(f"Starting evaluation with prompt type: {prompt_type}")
+    logger.info(f"{'='*50}\n")
+    
     # Initialize components
-    logger.info("Initializing system components...")
-    collector = FeedbackCollector(model="codellama")
-    processor = PromptProcessor(model="codellama")
+    feedback_collector = FeedbackCollector()
+    prompt_processor = PromptProcessor(initial_prompt)
     
     # Get all problems
     problems = get_all_problems()
     
-    # Common evaluation criteria
-    evaluation_criteria = [
+    # Evaluation criteria
+    criteria = [
         "correctness",
         "efficiency",
         "readability",
@@ -76,61 +87,87 @@ def run_problems():
         "documentation"
     ]
     
-    logger.info(f"Starting evaluation of {len(problems)} problems...")
-    
     # Process each problem
-    for i, problem in enumerate(tqdm(problems, desc="Processing problems")):
-        logger.info(f"\n\nProblem {i+1}: {problem['name']}")
+    for i, problem in enumerate(problems, 1):
+        logger.info(f"\nProblem {i}: {problem['name']}")
         logger.info("=" * 50)
-        logger.info(f"Description: {problem['description'].strip()}")
-        
-        # Log the solution being evaluated
-        logger.debug("\nSolution being evaluated:")
-        logger.debug(problem['solution'])
+        logger.info(f"Description: {problem['description']}")
         
         # Collect feedback
-        logger.info("\nCollecting feedback...")
-        feedback = collector.collect_solution_feedback(
+        feedback = feedback_collector.collect_solution_feedback(
             problem=problem['description'],
             solution=problem['solution'],
-            evaluation_criteria=evaluation_criteria
+            evaluation_criteria=criteria
         )
         
-        # Log detailed feedback
-        log_evaluation(feedback['evaluation'], evaluation_criteria)
+        # Log evaluation results
+        log_evaluation(feedback['evaluation'], criteria)
+        
+        # Log reflection
         log_reflection(feedback['reflection'])
         
-        # Small delay to avoid rate limiting
-        time.sleep(1)
+        # Process feedback
+        insights = prompt_processor.process_feedback(feedback)
+        
+        # Log insights
+        log_insights(insights)
+        
+        # Update system prompt
+        current_prompt = prompt_processor.get_current_prompt()
+        prompt_processor.update_prompt(insights)
+        updated_prompt = prompt_processor.get_current_prompt()
+        
+        # Log prompt evolution
+        log_prompt_evolution(current_prompt, updated_prompt)
+        
+        # Add delay to avoid rate limiting
+        await asyncio.sleep(1)
     
-    # Process all feedback and update system prompt
-    logger.info("\n\nProcessing all feedback...")
-    insights = processor.process_feedback()
-    
-    # Log insights
-    log_insights(insights)
-    
-    # Get current prompt before update
-    current_prompt = processor._load_current_prompt()
-    
-    # Update system prompt
-    logger.info("\nUpdating system prompt...")
-    updated_prompt = processor.update_system_prompt(insights)
-    
-    # Log prompt evolution
-    log_prompt_evolution(current_prompt, updated_prompt)
-    
-    # Save detailed run information
+    # Save run information
     run_info = {
         "timestamp": datetime.now().isoformat(),
+        "prompt_type": prompt_type,
+        "initial_prompt": initial_prompt,
+        "final_prompt": prompt_processor.get_current_prompt(),
         "problems_evaluated": len(problems),
-        "insights_generated": len(insights),
-        "evaluation_criteria": evaluation_criteria,
-        "final_insights": insights
+        "insights_generated": len(prompt_processor.get_insights()),
+        "evaluation_criteria": criteria,
+        "final_insights": prompt_processor.get_insights()
     }
     
-    with open("logs/run_info.json", "w") as f:
+    # Create logs directory if it doesn't exist
+    log_dir = Path("logs")
+    log_dir.mkdir(exist_ok=True)
+    
+    # Save run information
+    run_file = log_dir / f"run_info_{prompt_type}_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json"
+    with open(run_file, "w") as f:
         json.dump(run_info, f, indent=2)
+    
+    logger.info(f"\nRun information saved to {run_file}")
+    return run_info
+
+async def run_all_prompts():
+    """Run problems with all initial prompts."""
+    all_prompts = get_all_prompts()
+    results = {}
+    
+    for prompt_type, initial_prompt in all_prompts.items():
+        try:
+            result = await run_problems_with_prompt(initial_prompt, prompt_type)
+            results[prompt_type] = result
+        except Exception as e:
+            logger.error(f"Error running problems with prompt type {prompt_type}: {str(e)}")
+            results[prompt_type] = {"error": str(e)}
+    
+    # Save combined results
+    log_dir = Path("logs")
+    combined_file = log_dir / f"combined_results_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json"
+    with open(combined_file, "w") as f:
+        json.dump(results, f, indent=2)
+    
+    logger.info(f"\nCombined results saved to {combined_file}")
+    return results
 
 if __name__ == "__main__":
-    run_problems() 
+    asyncio.run(run_all_prompts()) 
