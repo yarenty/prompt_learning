@@ -1,13 +1,13 @@
 """
-Example script demonstrating the system prompt learning framework.
+Example script demonstrating the system prompt learning framework with Ollama.
 """
 from feedback_loop.collector import FeedbackCollector
 from prompt_integration.processor import PromptProcessor
 
 def main():
-    # Initialize components
-    collector = FeedbackCollector()
-    processor = PromptProcessor()
+    # Initialize components with CodeLlama model
+    collector = FeedbackCollector(model="codellama")
+    processor = PromptProcessor(model="codellama")
     
     # Example problem and solution
     problem = """

@@ -4,13 +4,14 @@ Feedback collection system for gathering and evaluating solution quality and ref
 import json
 from datetime import datetime
 from typing import Dict, List, Optional, Tuple
-import openai
+import ollama
 from pathlib import Path
 
 class FeedbackCollector:
-    def __init__(self, storage_path: str = "data/feedback"):
+    def __init__(self, storage_path: str = "data/feedback", model: str = "codellama"):
         self.storage_path = Path(storage_path)
         self.storage_path.mkdir(parents=True, exist_ok=True)
+        self.model = model
         
     def collect_solution_feedback(
         self,
@@ -46,9 +47,27 @@ class FeedbackCollector:
         criteria: List[str]
     ) -> Dict[str, float]:
         """Evaluate solution quality against given criteria."""
-        # TODO: Implement actual evaluation logic
-        # This could use LLM-based evaluation or specific metrics
-        return {criterion: 0.0 for criterion in criteria}
+        evaluation_prompt = f"""
+        Evaluate the following code solution against these criteria: {', '.join(criteria)}
+        For each criterion, provide a score between 0.0 and 1.0.
+        
+        Solution:
+        {solution}
+        
+        Provide your evaluation in JSON format with scores for each criterion.
+        """
+        
+        try:
+            response = ollama.generate(
+                model=self.model,
+                prompt=evaluation_prompt,
+                format="json"
+            )
+            evaluation = json.loads(response.response)
+            return {criterion: float(evaluation.get(criterion, 0.0)) for criterion in criteria}
+        except Exception as e:
+            print(f"Error in evaluation: {e}")
+            return {criterion: 0.0 for criterion in criteria}
     
     def _generate_reflection(
         self,
@@ -65,10 +84,18 @@ class FeedbackCollector:
         
         What general principles or strategies did you learn that could help solve similar problems in the future?
         Focus on extracting reusable patterns and approaches.
+        Provide a concise, actionable insight that could be applied to similar coding problems.
         """
         
-        # TODO: Implement actual reflection generation using LLM
-        return "Reflection placeholder"
+        try:
+            response = ollama.generate(
+                model=self.model,
+                prompt=reflection_prompt
+            )
+            return response.response.strip()
+        except Exception as e:
+            print(f"Error in reflection generation: {e}")
+            return "Failed to generate reflection"
     
     def _store_feedback(self, feedback: Dict) -> None:
         """Store feedback data to disk."""

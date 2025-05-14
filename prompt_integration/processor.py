@@ -8,16 +8,19 @@ from datetime import datetime
 import numpy as np
 from sklearn.cluster import DBSCAN
 from sklearn.feature_extraction.text import TfidfVectorizer
+import ollama
 
 class PromptProcessor:
     def __init__(
         self,
         feedback_path: str = "data/feedback",
-        prompt_path: str = "data/prompts"
+        prompt_path: str = "data/prompts",
+        model: str = "codellama"
     ):
         self.feedback_path = Path(feedback_path)
         self.prompt_path = Path(prompt_path)
         self.prompt_path.mkdir(parents=True, exist_ok=True)
+        self.model = model
         
     def process_feedback(self) -> List[Dict]:
         """Process all feedback files and extract insights."""
@@ -66,8 +69,25 @@ class PromptProcessor:
     
     def _synthesize_cluster_insight(self, reflections: List[str]) -> str:
         """Synthesize a single insight from a cluster of similar reflections."""
-        # TODO: Implement actual insight synthesis using LLM
-        return "Synthesized insight placeholder"
+        synthesis_prompt = f"""
+        Analyze these similar reflections and synthesize them into a single, clear insight:
+        
+        Reflections:
+        {chr(10).join(f'- {r}' for r in reflections)}
+        
+        Provide a concise, actionable insight that captures the common pattern or principle.
+        Focus on making it specific and applicable to future coding problems.
+        """
+        
+        try:
+            response = ollama.generate(
+                model=self.model,
+                prompt=synthesis_prompt
+            )
+            return response.response.strip()
+        except Exception as e:
+            print(f"Error in insight synthesis: {e}")
+            return "Failed to synthesize insight"
     
     def update_system_prompt(self, insights: List[Dict]) -> str:
         """Update the system prompt with new insights."""
