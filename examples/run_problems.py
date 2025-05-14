@@ -36,9 +36,8 @@ def log_insights(insights: list):
     logger.info("\nExtracted Insights:")
     logger.info("=" * 50)
     for insight in insights:
-        logger.info(f"\nInsight: {insight['text']}")
+        logger.info(f"\nInsight: {insight['insight']}")
         logger.info(f"Support Count: {insight['support_count']}")
-        logger.info(f"Confidence: {insight['confidence']:.2f}")
         logger.info("-" * 30)
 
 def log_prompt_evolution(current_prompt: str, updated_prompt: str):
@@ -72,7 +71,7 @@ async def run_problems_with_prompt(initial_prompt: str, prompt_type: str):
     
     # Initialize components
     feedback_collector = FeedbackCollector()
-    prompt_processor = PromptProcessor(initial_prompt)
+    prompt_processor = PromptProcessor()
     
     # Get all problems
     problems = get_all_problems()
@@ -106,18 +105,15 @@ async def run_problems_with_prompt(initial_prompt: str, prompt_type: str):
         # Log reflection
         log_reflection(feedback['reflection'])
         
-        # Process feedback
-        insights = prompt_processor.process_feedback(feedback)
+        # Process feedback and update system prompt
+        insights = prompt_processor.process_feedback()
+        updated_prompt = prompt_processor.update_system_prompt(insights)
         
         # Log insights
         log_insights(insights)
         
-        # Update system prompt
-        current_prompt = prompt_processor.get_current_prompt()
-        prompt_processor.update_prompt(insights)
-        updated_prompt = prompt_processor.get_current_prompt()
-        
         # Log prompt evolution
+        current_prompt = prompt_processor._load_current_prompt()
         log_prompt_evolution(current_prompt, updated_prompt)
         
         # Add delay to avoid rate limiting
@@ -128,11 +124,11 @@ async def run_problems_with_prompt(initial_prompt: str, prompt_type: str):
         "timestamp": datetime.now().isoformat(),
         "prompt_type": prompt_type,
         "initial_prompt": initial_prompt,
-        "final_prompt": prompt_processor.get_current_prompt(),
+        "final_prompt": prompt_processor._load_current_prompt(),
         "problems_evaluated": len(problems),
-        "insights_generated": len(prompt_processor.get_insights()),
+        "insights_generated": len(insights),
         "evaluation_criteria": criteria,
-        "final_insights": prompt_processor.get_insights()
+        "final_insights": insights
     }
     
     # Create logs directory if it doesn't exist
