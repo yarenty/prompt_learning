@@ -190,6 +190,11 @@ Each run generates:
 - Detailed insights and evaluation metrics
 - Prompt evolution history
 
+
+## Conclusions
+
+See [SUMMARY.md](SUMMARY.md)
+
 ## Contributing
 
 1. Fork the repository
