@@ -2,11 +2,14 @@
 
 ## The Spark: Karpathy's Shower Thought 💡
 
-Picture this: Andrej Karpathy, one of the brightest minds in AI, has a shower thought that could revolutionize how we teach AI. He tweets about a missing piece in the LLM learning puzzle - something he calls "system prompt learning." 
+Picture this: Andrej Karpathy, one of the brightest minds in AI, tweets about a missing piece in the LLM learning puzzle - something he calls "system prompt learning." 
 
 > "LLMs are quite literally like the guy in Memento, except we haven't given them their scratchpad yet."
 
-This brilliant analogy got us thinking: What if we could teach AI to write its own instruction manual? Like a musician learning to compose, but for code!
+This brilliant analogy got me thinking: What if we could teach AI to write its own instruction manual? Like a musician learning to compose, but for code!
+
+X posts: [https://x.com/karpathy/status/1921368866728432052](https://x.com/karpathy/status/1921368866728432052)
+
 
 ## The Current State: Claude's Massive Prompt 📚
 
@@ -19,7 +22,11 @@ But here's the interesting part: This massive prompt isn't just about behavior -
 
 It's like teaching someone to count by making them tap their fingers - explicit, but effective!
 
+Full article: [https://www.dbreunig.com/2025/05/07/claude-s-system-prompt-chatbots-are-more-than-just-models.html](https://www.dbreunig.com/2025/05/07/claude-s-system-prompt-chatbots-are-more-than-just-models.html)
+
 ## The Experiment: Teaching a Music Composer to Code 🎼
+
+Github: [https://github.com/yarenty/prompt_learning](https://github.com/yarenty/prompt_learning)
 
 ### The Initial Prompt
 ```
