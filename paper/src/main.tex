@@ -5,8 +5,8 @@
 \usepackage{amsmath}
 \usepackage{amsfonts}
 \usepackage{amssymb}
-\usepackage{listings}
-
+\usepackage{minted}
+\usepackage{alltt}
 
 
 \def\x{{\mathbf x}}
@@ -207,6 +207,8 @@ Our complete implementation and evaluation datasets are available at \href{https
 \end{figure}
 
 
+
+
  The system executes a five-phase cycle see Figure \ref{fig:cycle}:
 
 \begin{enumerate}
@@ -246,7 +248,7 @@ Where:
     \item d - domain
     \item f - confidence
     \item a - applicability\_conditions
-    \item h -usage\_history
+    \item h - usage\_history
 \end{itemize}
 
 
@@ -255,46 +257,64 @@ Where:
 
 \subsection{Core Algorithm Specifications}
 
-\paragraph{Algorithm 1: Memento Learning Cycle}
+\linebreak
 
 
-\begin{lstlisting}
+\begin{alltt}
 
-ALGORITHM: Memento_Learning_Cycle
-INPUT: Task T, Current System Prompt P_t, Principle Store Π_t
-OUTPUT: Updated System Prompt P_{t+1}, Task Result R, Updated Principle Store Π_{t+1}
+ALGORITHM: 
+Memento\_Learning\_Cycle 
+
+INPUTS: 
+T: Task, 
+P\textsubscript{t}: Current System Prompt,
+\prod\textsubscript{t}: Principle Store, 
+
+OUTPUTS: 
+P\textsubscript{t+1}: Updated System Prompt , 
+R: Task Result, 
+\prod\textsubscript{t+1}: Updated Principle Store,
 
 
 1. PROBLEM_SOLVING_PHASE:
-   R ← SOLVE(T, P_t)
-   execution_trace ← RECORD_REASONING_STEPS(T, P_t)
+   R := SOLVE(T, P\textsubscript{t})
+   execution_trace :=
+    RECORD_REASONING_STEPS(T, P\textsubscript{t})
 
    
 2. EVALUATION_PHASE:
-   M ← MULTI_DIMENSIONAL_EVALUATE(R, T)
-   quality_score ← AGGREGATE_METRICS(M)
+   M := MULTI_DIMENSIONAL_EVALUATE(R, T)
+   quality_score := AGGREGATE_METRICS(M)
    
 3. REFLECTION_PHASE:
-   I ← META_COGNITIVE_REFLECT(R, M, T, execution_trace)
-   strategy_analysis ← ANALYZE_STRATEGY_EFFECTIVENESS(I)
+   I := META_COGNITIVE_REFLECT(R, M, T, 
+                        execution_trace)
+   strategy_analysis := 
+    ANALYZE_STRATEGY_EFFECTIVENESS(I)
    
 4. PRINCIPLE_EXTRACTION_PHASE:
-   π_candidates ← EXTRACT_PRINCIPLE_CANDIDATES(I, R, M)
-   π_new ← VALIDATE_AND_FILTER_PRINCIPLES(π_candidates, Π_t)
-   Π_{t+1} ← UPDATE_PRINCIPLE_STORE(Π_t, π_new)
+   \pi\textsubscript{candidates} := 
+    EXTRACT_PRINCIPLE_CANDIDATES(I, R, M)
+
+   \pi\textsubscript{new} :=
+    VALIDATE_AND_FILTER_PRINCIPLES(
+                          \pi\textsubscript{candidates},\prod\textsubscript{t})
+                          
+   \prod\textsubscript{t+1} :=
+    UPDATE_PRINCIPLE_STORE(\prod\textsubscript{t}, \pi\textsubscript{new})
+
    
 5. PROMPT_EVOLUTION_PHASE:
-   relevant_principles ← RETRIEVE_RELEVANT_PRINCIPLES(Π_{t+1}, T)
-   P_{t+1} ← EVOLVE_PROMPT(P_t, π_new, relevant_principles)
+   relevant_principles :=
+    RETRIEVE_RELEVANT_PRINCIPLES(\prod\textsubscript{t+1}, T)
+    
+   P_{t+1} := 
+    EVOLVE_PROMPT(P\textsubscript{t}, \pi\textsubscript{new}, relevant_principles)
    
-6. RETURN P_{t+1}, R, Π_{t+1}
+6. RETURN \textbf{P\textsubscript{t+1}, R, \prod\textsubscript{t+1}}
 
-\end{lstlisting}
-
-\textbf{Time Complexity:} O(|P\textit{t| + log|Π}t| + k·n) where k is the number of principle candidates and n is the evaluation dimension count.
-
-\textbf{Space Complexity:} O(|Π\textit{t| + |P}t| + |execution\_trace|)
-
+\end{alltt}
+\paragraph{Algorithm 1: Memento Learning Cycle}
 
 
 \subsection{Evaluation Criteria}
