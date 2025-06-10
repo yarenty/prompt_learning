@@ -37,6 +37,7 @@ data/
 logs/
 .env
 .env.*
+/tmp
 
 # Jupyter Notebook
 .ipynb_checkpoints
