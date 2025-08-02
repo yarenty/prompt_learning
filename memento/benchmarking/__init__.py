@@ -1,39 +1,44 @@
 """
-Memento Benchmarking Framework
+Professional Benchmarking Framework for Memento
 
-This module provides comprehensive benchmarking capabilities for comparing
-Memento against other prompt evolution approaches including:
-- PromptBreeder (evolutionary optimization)
-- Self-Evolving GPT (experience accumulation)
-- Auto-Evolve (self-reasoning framework)
+This module provides comprehensive benchmarking capabilities using:
+- Standard open-source datasets (HumanEval, MATH, BiGGen-Bench, etc.)
+- Professional evaluation metrics and statistical analysis
+- Comparative analysis against established baselines
+- Reproducible and peer-reviewed evaluation protocols
 
-The framework includes:
-- Baseline implementations of competing methods
-- Standardized evaluation metrics
-- Statistical analysis tools
-- Visualization capabilities
-- Integration with open-source datasets
+Components:
+- StandardBenchmarkRunner: Main benchmarking orchestrator
+- Baseline implementations: PromptBreeder, Self-Evolving GPT, Auto-Evolve
+- Evaluation metrics and statistical analysis tools
+- Visualization and reporting utilities
 """
 
-from .baselines import AutoEvolve, PromptBreeder, SelfEvolvingGPT
-from .datasets import APPSDataset, CodeContestsDataset, HumanEvalDataset
-from .evaluation import BenchmarkRunner, EvaluationMetrics, StatisticalAnalyzer
-from .visualization import ComparisonPlotter, ResultsVisualizer
+from .baselines.auto_evolve import AutoEvolve
+
+# Baseline implementations for comparison
+from .baselines.prompt_breeder import PromptBreeder
+from .baselines.self_evolving_gpt import SelfEvolvingGPT
+
+# Core benchmarking framework
+from .evaluation.benchmark_runner import StandardBenchmarkRunner
+from .evaluation.metrics import EvaluationMetrics
+from .evaluation.statistical_analyzer import StatisticalAnalyzer
+from .visualization.comparison_plotter import ComparisonPlotter
+
+# Visualization and reporting
+from .visualization.results_visualizer import ResultsVisualizer
 
 __all__ = [
+    # Main benchmarking framework (RECOMMENDED)
+    "StandardBenchmarkRunner",
+    "EvaluationMetrics",
+    "StatisticalAnalyzer",
     # Baseline implementations
     "PromptBreeder",
     "SelfEvolvingGPT",
     "AutoEvolve",
-    # Evaluation framework
-    "BenchmarkRunner",
-    "EvaluationMetrics",
-    "StatisticalAnalyzer",
-    # Datasets
-    "HumanEvalDataset",
-    "APPSDataset",
-    "CodeContestsDataset",
-    # Visualization
+    # Visualization tools
     "ResultsVisualizer",
     "ComparisonPlotter",
 ]
