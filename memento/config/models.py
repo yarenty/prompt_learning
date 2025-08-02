@@ -8,7 +8,7 @@ from enum import Enum
 from pathlib import Path
 from typing import List, Optional
 
-from pydantic import BaseModel, Field, validator
+from pydantic import BaseModel, Field, field_validator
 
 
 class ModelType(str, Enum):
@@ -39,7 +39,8 @@ class ModelConfig(BaseModel):
     max_tokens: int = Field(default=2048, ge=1, description="Maximum tokens to generate")
     timeout: int = Field(default=30, ge=1, description="Request timeout in seconds")
 
-    @validator("model_name")
+    @field_validator("model_name")
+    @classmethod
     def validate_model_name(cls, v):
         """Validate model name is not empty."""
         if not v.strip():
@@ -59,7 +60,8 @@ class EvaluationConfig(BaseModel):
     cache_results: bool = Field(default=True, description="Whether to cache evaluation results")
     cache_ttl: int = Field(default=3600, description="Cache TTL in seconds")
 
-    @validator("criteria")
+    @field_validator("criteria")
+    @classmethod
     def validate_criteria(cls, v):
         """Validate evaluation criteria."""
         if not v:
@@ -76,14 +78,15 @@ class StorageConfig(BaseModel):
     logs_path: Path = Field(default=Path("logs"), description="Path for log files")
     cache_path: Path = Field(default=Path("data/cache"), description="Path for cache data")
 
-    @validator(
+    @field_validator(
         "base_path",
         "feedback_path",
         "evolution_path",
         "logs_path",
         "cache_path",
-        pre=True,
+        mode="before",
     )
+    @classmethod
     def create_paths(cls, v):
         """Create directories if they don't exist."""
         path = Path(v)
@@ -111,7 +114,8 @@ class LearningConfig(BaseModel):
         description="Threshold for principle similarity matching",
     )
 
-    @validator("max_iterations")
+    @field_validator("max_iterations")
+    @classmethod
     def validate_max_iterations(cls, v):
         """Validate maximum iterations."""
         if v < 1:
@@ -135,7 +139,8 @@ class BenchmarkConfig(BaseModel):
         description="Statistical significance level for tests",
     )
 
-    @validator("dataset_path", "results_path", pre=True)
+    @field_validator("dataset_path", "results_path", mode="before")
+    @classmethod
     def create_paths(cls, v):
         """Create directories if they don't exist."""
         path = Path(v)
