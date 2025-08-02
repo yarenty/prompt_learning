@@ -40,7 +40,7 @@ class MementoDemo:
             path.mkdir(parents=True, exist_ok=True)
 
         # Model configuration
-        self.model_config = ModelConfig(model_type=ModelType.OLLAMA, model_name="codellama", temperature=0.7)
+        self.model_config = ModelConfig(model_type=ModelType.OLLAMA, model_name="llama3.2", temperature=0.7)
 
         # Initialize components
         self.learner = PromptLearner(

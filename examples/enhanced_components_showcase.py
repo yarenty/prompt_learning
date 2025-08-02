@@ -22,7 +22,7 @@ async def showcase_feedback_collector():
     print("=" * 50)
 
     # Setup
-    model_config = ModelConfig(model_type=ModelType.OLLAMA, model_name="codellama", temperature=0.3)
+    model_config = ModelConfig(model_type=ModelType.OLLAMA, model_name="llama3.2", temperature=0.3)
 
     storage_path = Path("./demo_feedback")
     storage_path.mkdir(exist_ok=True)
@@ -139,7 +139,7 @@ async def showcase_prompt_processor():
     print("=" * 50)
 
     # Setup
-    model_config = ModelConfig(model_type=ModelType.OLLAMA, model_name="codellama", temperature=0.4)
+    model_config = ModelConfig(model_type=ModelType.OLLAMA, model_name="llama3.2", temperature=0.4)
 
     feedback_path = Path("./demo_feedback/llm")
     prompt_path = Path("./demo_prompts")
@@ -322,7 +322,7 @@ async def showcase_component_integration():
     print("=" * 50)
 
     # Setup components
-    model_config = ModelConfig(model_type=ModelType.OLLAMA, model_name="codellama", temperature=0.5)
+    model_config = ModelConfig(model_type=ModelType.OLLAMA, model_name="llama3.2", temperature=0.5)
 
     feedback_path = Path("./demo_feedback/llm")
     prompt_path = Path("./demo_prompts")

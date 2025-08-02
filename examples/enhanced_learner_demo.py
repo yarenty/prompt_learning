@@ -19,7 +19,7 @@ async def demo_enhanced_learner():
     print("=" * 50)
 
     # Create model configuration
-    model_config = ModelConfig(model_type=ModelType.OLLAMA, model_name="codellama", temperature=0.7, max_tokens=2048)
+    model_config = ModelConfig(model_type=ModelType.OLLAMA, model_name="llama3.2", temperature=0.7, max_tokens=2048)
 
     # Create learner with metrics enabled
     learner = PromptLearner(model_config=model_config, storage_path="data/enhanced_demo", enable_metrics=True)
@@ -137,7 +137,7 @@ async def demo_error_handling():
     print("=" * 40)
 
     # Create learner
-    model_config = ModelConfig(model_type=ModelType.OLLAMA, model_name="codellama")
+    model_config = ModelConfig(model_type=ModelType.OLLAMA, model_name="llama3.2")
 
     learner = PromptLearner(model_config=model_config, storage_path="data/error_demo", enable_metrics=False)
 
