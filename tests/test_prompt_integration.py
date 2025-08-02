@@ -1,10 +1,8 @@
 """
-Test cases for the prompt integration system.
+Tests for prompt integration functionality.
 """
 
 import json
-import shutil
-from pathlib import Path
 
 import pytest
 
@@ -19,8 +17,8 @@ def temp_dirs(tmp_path):
     feedback_dir.mkdir()
     prompt_dir.mkdir()
     yield feedback_dir, prompt_dir
-    shutil.rmtree(feedback_dir)
-    shutil.rmtree(prompt_dir)
+    # shutil.rmtree(feedback_dir) # This line was removed from the original file, so it's removed here.
+    # shutil.rmtree(prompt_dir) # This line was removed from the original file, so it's removed here.
 
 
 @pytest.fixture

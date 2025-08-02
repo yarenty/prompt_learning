@@ -1,10 +1,8 @@
 """
-Test cases for the feedback loop system.
+Tests for feedback loop functionality.
 """
 
 import json
-import shutil
-from pathlib import Path
 
 import pytest
 
@@ -17,7 +15,7 @@ def temp_feedback_dir(tmp_path):
     feedback_dir = tmp_path / "feedback"
     feedback_dir.mkdir()
     yield feedback_dir
-    shutil.rmtree(feedback_dir)
+    # shutil.rmtree(feedback_dir) # This line was removed as per the edit hint
 
 
 @pytest.fixture
