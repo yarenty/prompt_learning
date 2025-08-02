@@ -90,8 +90,8 @@ class TestPromptLearner:
         # Test with invalid lessons
         with pytest.raises(ValidationError, match="Lesson missing required field"):
             await learner.evolve_prompt(
-                current_prompt="You are a programmer", lessons=[{"criterion": "test"}]  # Missing lesson
-            )
+                current_prompt="You are a programmer", lessons=[{"criterion": "test"}]
+            )  # Missing lesson
 
     @pytest.mark.asyncio
     async def test_save_evolution_step_validation(self, learner):
