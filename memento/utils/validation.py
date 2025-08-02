@@ -368,52 +368,43 @@ def validate_json_response(response: str) -> Dict[str, Any]:
     return parsed
 
 
-def validate_feedback_data(feedback: Dict[str, Any]) -> Dict[str, Any]:
+def validate_feedback_data(feedback: Dict[str, Any]) -> None:
     """
-    Validate feedback data structure.
+    Validate comprehensive feedback data structure.
 
     Args:
-        feedback: The feedback data to validate
-
-    Returns:
-        The validated feedback data
+        feedback: Feedback data dictionary
 
     Raises:
-        ValidationError: If feedback is invalid
+        ValidationError: If feedback data is invalid
     """
     if not isinstance(feedback, dict):
-        raise ValidationError("Feedback must be a dictionary")
+        raise ValidationError("Feedback data must be a dictionary")
 
-    required_fields = ["timestamp", "problem", "solution"]
+    required_fields = ["timestamp", "problem", "solution", "evaluation", "reflection"]
     for field in required_fields:
         if field not in feedback:
-            raise ValidationError(f"Feedback missing required field: {field}")
+            raise ValidationError(f"Missing required field: {field}")
 
-    # Validate timestamp
-    timestamp = feedback["timestamp"]
-    if not isinstance(timestamp, str):
-        raise ValidationError("Timestamp must be a string")
+    # Validate timestamp format
+    try:
+        from datetime import datetime
 
-    # Validate problem and solution
-    if not isinstance(feedback["problem"], str) or not feedback["problem"].strip():
-        raise ValidationError("Problem must be a non-empty string")
+        datetime.fromisoformat(feedback["timestamp"])
+    except ValueError as e:
+        raise ValidationError(f"Invalid timestamp format: {e}") from e
 
-    if not isinstance(feedback["solution"], str) or not feedback["solution"].strip():
-        raise ValidationError("Solution must be a non-empty string")
+    # Validate evaluation structure
+    evaluation = feedback["evaluation"]
+    if not isinstance(evaluation, dict):
+        raise ValidationError("Evaluation must be a dictionary")
 
-    # Validate optional fields
-    if "evaluation" in feedback:
-        feedback["evaluation"] = validate_evaluation_result(feedback["evaluation"])
+    for criterion, score in evaluation.items():
+        if not isinstance(score, (int, float)):
+            raise ValidationError(f"Evaluation score for '{criterion}' must be numeric")
+        if not 0.0 <= score <= 1.0:
+            raise ValidationError(f"Evaluation score for '{criterion}' must be between 0.0 and 1.0")
 
-    if "reflection" in feedback:
-        reflection = feedback["reflection"]
-        if not isinstance(reflection, str):
-            raise ValidationError("Reflection must be a string")
-
-    return {
-        "timestamp": timestamp,
-        "problem": feedback["problem"].strip(),
-        "solution": feedback["solution"].strip(),
-        "evaluation": feedback.get("evaluation", {}),
-        "reflection": feedback.get("reflection", "").strip(),
-    }
+    # Validate reflection
+    if not isinstance(feedback["reflection"], str) or not feedback["reflection"].strip():
+        raise ValidationError("Reflection must be a non-empty string")
