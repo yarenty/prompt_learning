@@ -19,9 +19,7 @@ def setup_logger(name: str = "prompt_learning") -> logging.Logger:
     logger.setLevel(logging.DEBUG)
 
     # Create formatters
-    detailed_formatter = logging.Formatter(
-        "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
-    )
+    detailed_formatter = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
     simple_formatter = logging.Formatter("%(message)s")
 
     # File handler for detailed logs

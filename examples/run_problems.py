@@ -108,9 +108,7 @@ async def run_problems_with_prompt(initial_prompt: str, prompt_type: str):
         log_lessons(evaluation_result["lessons"])
 
         # Evolve prompt based on lessons
-        updated_prompt = learner.evolve_prompt(
-            current_prompt=current_prompt, lessons=evaluation_result["lessons"]
-        )
+        updated_prompt = learner.evolve_prompt(current_prompt=current_prompt, lessons=evaluation_result["lessons"])
 
         # Log prompt evolution
         log_prompt_evolution(current_prompt, updated_prompt)
@@ -149,10 +147,7 @@ async def run_problems_with_prompt(initial_prompt: str, prompt_type: str):
     log_dir.mkdir(exist_ok=True)
 
     # Save run information
-    run_file = (
-        log_dir
-        / f"run_info_{prompt_type}_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json"
-    )
+    run_file = log_dir / f"run_info_{prompt_type}_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json"
     with open(run_file, "w") as f:
         json.dump(run_info, f, indent=2)
 
@@ -170,16 +165,12 @@ async def run_all_prompts():
             result = await run_problems_with_prompt(initial_prompt, prompt_type)
             results[prompt_type] = result
         except Exception as e:
-            logger.error(
-                f"Error running problems with prompt type {prompt_type}: {str(e)}"
-            )
+            logger.error(f"Error running problems with prompt type {prompt_type}: {str(e)}")
             results[prompt_type] = {"error": str(e)}
 
     # Save combined results
     log_dir = Path("logs")
-    combined_file = (
-        log_dir / f"combined_results_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json"
-    )
+    combined_file = log_dir / f"combined_results_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json"
     with open(combined_file, "w") as f:
         json.dump(results, f, indent=2)
 

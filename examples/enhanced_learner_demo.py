@@ -111,8 +111,8 @@ print(find_max([-1, -2, -3]))  # -1
         try:
             # This should raise a ValidationError
             await learner.evaluate_prompt_performance(
-                prompt="", problem=problem, evaluation_criteria=criteria  # Empty prompt
-            )
+                prompt="", problem=problem, evaluation_criteria=criteria
+            )  # Empty prompt
         except ValidationError as e:
             print(f"✅ Validation caught error: {e}")
 
