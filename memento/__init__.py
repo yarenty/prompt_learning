@@ -1,22 +1,14 @@
 """
-Memento: A Meta-Cognitive Framework for Self-Evolving System Prompts in AI Systems
+Memento: Meta-Cognitive Framework for Self-Evolving System Prompts
 
-A novel framework that enables large language models (LLMs) to improve their
-problem-solving capabilities through self-evolving system prompts autonomously.
+A comprehensive framework for prompt evolution through self-learning and feedback integration.
+Includes benchmarking capabilities against other prompt evolution methods.
 """
 
-__version__ = "0.1.0"
-__author__ = "Jaroslaw Nowosad"
-__email__ = "jaroslaw.nowosad@huawei.com"
-__description__ = "A Meta-Cognitive Framework for Self-Evolving System Prompts in AI Systems"
-
-from .core.collector import FeedbackCollector
-
-# Core imports
-from .core.learner import PromptLearner
-from .core.processor import PromptProcessor
-
-# Exception imports
+# Benchmarking framework
+from . import benchmarking
+from .config import EvaluationBackend, ModelConfig, ModelType
+from .core import FeedbackCollector, PromptLearner, PromptProcessor
 from .exceptions import (
     CollectionError,
     ConfigurationError,
@@ -31,24 +23,29 @@ from .exceptions import (
     ValidationError,
 )
 
-# Version info
+__version__ = "0.4.0"
+
 __all__ = [
+    # Core functionality
     "PromptLearner",
     "FeedbackCollector",
     "PromptProcessor",
+    # Configuration
+    "ModelConfig",
+    "ModelType",
+    "EvaluationBackend",
+    # Exceptions
     "MementoError",
     "ValidationError",
     "EvaluationError",
     "EvolutionError",
     "CollectionError",
-    "ReflectionError",
     "ProcessingError",
     "ExtractionError",
-    "UpdateError",
+    "ReflectionError",
     "StorageError",
     "ConfigurationError",
-    "__version__",
-    "__author__",
-    "__email__",
-    "__description__",
+    "UpdateError",
+    # Benchmarking
+    "benchmarking",
 ]
