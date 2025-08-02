@@ -13,7 +13,7 @@ PROBLEMS = [
         "solution": """
         def get_even_numbers(numbers):
             return [num for num in numbers if num % 2 == 0]
-        """
+        """,
     },
     {
         "name": "String Palindrome",
@@ -26,7 +26,7 @@ PROBLEMS = [
             # Clean the string: remove non-alphanumeric and convert to lowercase
             cleaned = ''.join(c.lower() for c in text if c.isalnum())
             return cleaned == cleaned[::-1]
-        """
+        """,
     },
     {
         "name": "Tree Traversal",
@@ -51,7 +51,7 @@ PROBLEMS = [
                 traverse(node.right)
             traverse(root)
             return result
-        """
+        """,
     },
     {
         "name": "Concurrent Task Processing",
@@ -76,7 +76,7 @@ PROBLEMS = [
             return await asyncio.gather(
                 *[process_with_semaphore(task) for task in tasks]
             )
-        """
+        """,
     },
     {
         "name": "Database Connection Pool",
@@ -111,7 +111,7 @@ PROBLEMS = [
             def _create_connection(self) -> object:
                 # Simulate connection creation
                 return object()
-        """
+        """,
     },
     {
         "name": "Caching Decorator",
@@ -155,7 +155,7 @@ PROBLEMS = [
                     return result
                 return wrapper
             return decorator
-        """
+        """,
     },
     {
         "name": "Error Handling Middleware",
@@ -195,14 +195,16 @@ PROBLEMS = [
                         }
                 return wrapper
             return decorator
-        """
-    }
+        """,
+    },
 ]
+
 
 def get_problem(index: int = 0) -> dict:
     """Get a problem by index."""
     return PROBLEMS[index % len(PROBLEMS)]
 
+
 def get_all_problems() -> list:
     """Get all problems."""
-    return PROBLEMS 
+    return PROBLEMS
