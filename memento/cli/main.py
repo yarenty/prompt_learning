@@ -50,7 +50,7 @@ def version():
 @app.command()
 def init(
     config_file: Optional[Path] = typer.Option(None, "--config", "-c", help="Path to configuration file"),
-    model: str = typer.Option("codellama", "--model", "-m", help="Model to use"),
+    model: str = typer.Option("llama3.2", "--model", "-m", help="Model to use"),
     log_level: str = typer.Option("INFO", "--log-level", "-l", help="Logging level"),
 ):
     """Initialize the Memento framework."""
@@ -105,7 +105,7 @@ def init(
 @app.command()
 def run(
     problem_file: Path = typer.Argument(..., help="Path to problem file"),
-    model: str = typer.Option("codellama", "--model", "-m", help="Model to use"),
+    model: str = typer.Option("llama3.2", "--model", "-m", help="Model to use"),
     iterations: int = typer.Option(10, "--iterations", "-i", help="Number of iterations"),
     output_dir: Optional[Path] = typer.Option(None, "--output", "-o", help="Output directory"),
 ):

@@ -32,7 +32,7 @@ class ModelConfig(BaseModel):
     """Configuration for LLM models."""
 
     model_type: ModelType = Field(default=ModelType.OLLAMA, description="Type of model to use")
-    model_name: str = Field(default="codellama", description="Name of the specific model")
+    model_name: str = Field(default="llama3.2", description="Name of the specific model")
     api_key: Optional[str] = Field(default=None, description="API key for the model service")
     base_url: Optional[str] = Field(default=None, description="Base URL for the model service")
     temperature: float = Field(default=0.7, ge=0.0, le=2.0, description="Sampling temperature")
