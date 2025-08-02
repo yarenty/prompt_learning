@@ -1,5 +1,18 @@
 # Changelog
 
+## [0.3.0] - Core Module Enhancement
+
+- **Abstract Base Classes**: Created comprehensive interfaces for `BaseLearner`, `BaseCollector`, and `BaseProcessor`
+- **Custom Exception Hierarchy**: Added 11 custom exception classes for better error categorization and handling
+- **Comprehensive Validation**: Input validation for all parameters with detailed error messages
+- **Performance Metrics**: Optional metrics collection with timing context managers and performance reports
+- **Async Support**: All LLM operations now support async/await for better performance
+- **Pydantic V2 Migration**: Updated to modern Pydantic features with field validators
+- **Testing Infrastructure**: 18 comprehensive test cases with async support and mocking
+- **Circular Import Resolution**: Clean module structure with proper separation of concerns
+- **Virtual Environment**: Set up with `uv` for clean dependency management
+- **Production Quality**: Professional-grade code with comprehensive error handling and validation
+
 ## [0.2.0] - Project Architecture Overhaul
 
 - Refactored the entire codebase into a professional Python package structure (`memento/`).
