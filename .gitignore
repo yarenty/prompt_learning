@@ -39,6 +39,12 @@ logs/
 .env.*
 /tmp
 
+# Temporary test directories
+test_*/
+demo_data/
+quick_test_data/
+*_test_data/
+
 # Jupyter Notebook
 .ipynb_checkpoints
 
