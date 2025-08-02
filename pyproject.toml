@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "memento"
-version = "0.1.0"
+version = "0.4.0"
 description = "A Meta-Cognitive Framework for Self-Evolving System Prompts in AI Systems"
 readme = "README.md"
 license = {text = "MIT"}
@@ -35,7 +35,9 @@ dependencies = [
     "numpy>=1.21.0",
     "pandas>=1.3.0",
     "scikit-learn>=0.24.0",
+    "scipy>=1.7.0",
     "pydantic>=2.0.0",
+    "pydantic-settings>=2.0.0",
     "ollama>=0.1.0",
     "openai>=1.0.0",
     "anthropic>=0.7.0",
@@ -127,7 +129,7 @@ profile = "black"
 multi_line_output = 3
 line_length = 120
 known_first_party = ["memento"]
-known_third_party = ["numpy", "pandas", "scikit-learn", "pydantic", "ollama"]
+known_third_party = ["numpy", "pandas", "scikit-learn", "scipy", "pydantic", "pydantic_settings", "ollama"]
 
 [tool.flake8]
 max-line-length = 120
@@ -158,7 +160,7 @@ warn_unreachable = true
 strict_equality = true
 
 [[tool.mypy.overrides]]
-module = ["ollama.*", "openai.*", "anthropic.*", "redis.*", "sqlalchemy.*"]
+module = ["ollama.*", "openai.*", "anthropic.*", "redis.*", "sqlalchemy.*", "scipy.*"]
 ignore_missing_imports = true
 
 [tool.pytest.ini_options]
