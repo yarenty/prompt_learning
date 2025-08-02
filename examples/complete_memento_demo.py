@@ -74,18 +74,21 @@ class MementoDemo:
         print("=" * 60)
 
         initial_prompt = "You are a helpful coding assistant. Write clean, efficient code."
-        problem = "Write a Python function to calculate fibonacci numbers efficiently."
+        problem = {
+            "description": "Write a Python function to calculate fibonacci numbers efficiently.",
+            "solution": "def fibonacci(n): return n if n <= 1 else fibonacci(n-1) + fibonacci(n-2)",
+        }
         criteria = ["correctness", "efficiency", "readability", "scalability"]
 
         print(f"📝 Initial Prompt: {initial_prompt}")
-        print(f"🎯 Problem: {problem}")
+        print(f"🎯 Problem: {problem['description']}")
         print(f"📊 Criteria: {', '.join(criteria)}")
 
         try:
             # Evaluate prompt performance
             print("\n🔍 Evaluating prompt performance...")
             evaluation_result = await self.learner.evaluate_prompt_performance(
-                prompt=initial_prompt, problem=problem, criteria=criteria
+                prompt=initial_prompt, problem=problem, evaluation_criteria=criteria
             )
 
             print("✅ Evaluation completed!")
@@ -275,11 +278,14 @@ class MementoDemo:
         print("=" * 80)
 
         initial_prompt = "You are a Python programming assistant."
-        problem = "Create a function to find the maximum element in a list efficiently."
+        problem_dict = {
+            "description": "Create a function to find the maximum element in a list efficiently.",
+            "solution": "def find_max(lst): return max(lst) if lst else None",
+        }
         solution = "def find_max(lst): return max(lst) if lst else None"
         criteria = ["correctness", "efficiency", "readability"]
 
-        print(f"🎯 Problem: {problem}")
+        print(f"🎯 Problem: {problem_dict['description']}")
         print(f"💡 Solution: {solution}")
         print(f"📊 Criteria: {', '.join(criteria)}")
 
@@ -287,14 +293,14 @@ class MementoDemo:
             # Stage 1: Initial prompt evaluation
             print("\n📋 Stage 1: Initial Prompt Evaluation")
             evaluation = await self.learner.evaluate_prompt_performance(
-                prompt=initial_prompt, problem=problem, criteria=criteria
+                prompt=initial_prompt, problem=problem_dict, evaluation_criteria=criteria
             )
             print(f"✅ Initial evaluation completed - {len(evaluation['lessons'])} lessons learned")
 
             # Stage 2: Detailed feedback collection
             print("\n📊 Stage 2: Detailed Feedback Collection")
             feedback = await self.collector.collect_solution_feedback(
-                problem=problem, solution=solution, evaluation_criteria=criteria
+                problem=problem_dict["description"], solution=solution, evaluation_criteria=criteria
             )
             print(f"✅ Feedback collected - Backend: {feedback['backend']}")
 
