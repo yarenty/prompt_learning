@@ -16,7 +16,7 @@ class TestPromptLearner:
     @pytest.fixture
     def model_config(self):
         """Create a test model configuration."""
-        return ModelConfig(model_type=ModelType.OLLAMA, model_name="codellama", temperature=0.7, max_tokens=2048)
+        return ModelConfig(model_type=ModelType.OLLAMA, model_name="llama3.2", temperature=0.7, max_tokens=2048)
 
     @pytest.fixture
     def storage_path(self, tmp_path):
@@ -212,7 +212,7 @@ class TestPromptLearnerIntegration:
     @pytest.fixture
     def model_config(self):
         """Create a test model configuration."""
-        return ModelConfig(model_type=ModelType.OLLAMA, model_name="codellama", temperature=0.7, max_tokens=2048)
+        return ModelConfig(model_type=ModelType.OLLAMA, model_name="llama3.2", temperature=0.7, max_tokens=2048)
 
     @pytest.fixture
     def storage_path(self, tmp_path):

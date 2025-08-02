@@ -25,7 +25,7 @@ class TestMementoIntegration:
     @pytest.fixture
     def model_config(self):
         """Create test model configuration."""
-        return ModelConfig(model_type=ModelType.OLLAMA, model_name="codellama", temperature=0.7)
+        return ModelConfig(model_type=ModelType.OLLAMA, model_name="llama3.2", temperature=0.7)
 
     @pytest.fixture
     def temp_paths(self):
@@ -401,7 +401,7 @@ class TestMementoIntegration:
         """Test that components maintain proper storage path isolation."""
         storage_path, feedback_path, prompt_path = temp_paths
 
-        model_config = ModelConfig(model_type=ModelType.OLLAMA, model_name="codellama")
+        model_config = ModelConfig(model_type=ModelType.OLLAMA, model_name="llama3.2")
 
         learner = PromptLearner(model_config=model_config, storage_path=storage_path)
         collector = FeedbackCollector(model_config=model_config, storage_path=feedback_path)

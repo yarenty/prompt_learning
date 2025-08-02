@@ -70,7 +70,7 @@ class TestPromptProcessor:
     @pytest.fixture
     def model_config(self):
         """Create test model configuration."""
-        return ModelConfig(model_type=ModelType.OLLAMA, model_name="codellama", temperature=0.3)
+        return ModelConfig(model_type=ModelType.OLLAMA, model_name="llama3.2", temperature=0.3)
 
     @pytest.fixture
     def temp_paths(self):
@@ -463,7 +463,7 @@ class TestPromptProcessorIntegration:
     @pytest.fixture
     def model_config(self):
         """Create test model configuration."""
-        return ModelConfig(model_type=ModelType.OLLAMA, model_name="codellama", temperature=0.3)
+        return ModelConfig(model_type=ModelType.OLLAMA, model_name="llama3.2", temperature=0.3)
 
     @pytest.fixture
     def temp_paths(self):

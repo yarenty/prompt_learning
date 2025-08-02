@@ -21,7 +21,7 @@ class TestFeedbackCollector:
     @pytest.fixture
     def model_config(self):
         """Create test model configuration."""
-        return ModelConfig(model_type=ModelType.OLLAMA, model_name="codellama", temperature=0.7)
+        return ModelConfig(model_type=ModelType.OLLAMA, model_name="llama3.2", temperature=0.7)
 
     @pytest.fixture
     def storage_path(self):
@@ -297,7 +297,7 @@ class TestFeedbackCollectorIntegration:
     @pytest.fixture
     def model_config(self):
         """Create test model configuration."""
-        return ModelConfig(model_type=ModelType.OLLAMA, model_name="codellama", temperature=0.5)
+        return ModelConfig(model_type=ModelType.OLLAMA, model_name="llama3.2", temperature=0.5)
 
     @pytest.fixture
     def storage_path(self):
