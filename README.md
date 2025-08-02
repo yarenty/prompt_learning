@@ -73,8 +73,8 @@ pre-commit install
 ### Model Setup
 
 ```bash
-# Pull CodeLlama model (recommended)
-ollama pull codellama
+# Pull Llama 3.2 model (recommended)
+ollama pull llama3.2
 
 # Or pull other models
 ollama pull llama2
@@ -99,9 +99,9 @@ memento status
 from memento import PromptLearner, FeedbackCollector, PromptProcessor
 
 # Initialize components
-learner = PromptLearner(model="codellama")
-collector = FeedbackCollector(model="codellama")
-processor = PromptProcessor(model="codellama")
+learner = PromptLearner(model="llama3.2")
+collector = FeedbackCollector(model="llama3.2")
+processor = PromptProcessor(model="llama3.2")
 
 # Define a problem
 problem = {
@@ -202,9 +202,9 @@ from memento.utils.logger import setup_logger
 logger = setup_logger("experiment", level="DEBUG")
 
 # Initialize all components
-learner = PromptLearner(model="codellama")
-collector = FeedbackCollector(model="codellama")
-processor = PromptProcessor(model="codellama")
+learner = PromptLearner(model="llama3.2")
+collector = FeedbackCollector(model="llama3.2")
+processor = PromptProcessor(model="llama3.2")
 
 # Run multi-iteration learning
 for iteration in range(10):
@@ -243,7 +243,7 @@ MEMENTO_LOG_LEVEL=INFO
 
 # Model Configuration
 MEMENTO__MODEL__MODEL_TYPE=ollama
-MEMENTO__MODEL__MODEL_NAME=codellama
+MEMENTO__MODEL__MODEL_NAME=llama3.2
 MEMENTO__MODEL__TEMPERATURE=0.7
 MEMENTO__MODEL__MAX_TOKENS=2048
 
@@ -266,7 +266,7 @@ from memento.config import ModelConfig, EvaluationConfig, LearningConfig
 # Model configuration
 model_config = ModelConfig(
     model_type="ollama",
-    model_name="codellama",
+    model_name="llama3.2",
     temperature=0.7,
     max_tokens=2048
 )
