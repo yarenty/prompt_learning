@@ -8,9 +8,7 @@ other framework components.
 import json
 import re
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Union
-
-from ..config import get_settings
+from typing import Any, Dict, Union
 
 
 def validate_config(config: Dict[str, Any]) -> bool:
@@ -78,9 +76,7 @@ def validate_model_config(model_config: Dict[str, Any]) -> bool:
     # Validate API key for cloud models
     if model_config["model_type"] in ["openai", "anthropic"]:
         if not model_config.get("api_key"):
-            raise ValueError(
-                f"API key required for {model_config['model_type']} models"
-            )
+            raise ValueError(f"API key required for {model_config['model_type']} models")
 
     # Validate temperature
     if "temperature" in model_config:
@@ -213,10 +209,7 @@ def validate_problem(problem: Dict[str, Any]) -> bool:
             raise ValueError(f"Missing required problem field: {field}")
 
     # Validate description
-    if (
-        not isinstance(problem["description"], str)
-        or not problem["description"].strip()
-    ):
+    if not isinstance(problem["description"], str) or not problem["description"].strip():
         raise ValueError("Problem description must be a non-empty string")
 
     # Validate solution

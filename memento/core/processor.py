@@ -5,9 +5,8 @@ System for processing feedback and integrating insights into the system prompt.
 import json
 from datetime import datetime
 from pathlib import Path
-from typing import Dict, List, Optional
+from typing import Dict, List
 
-import numpy as np
 import ollama
 from sklearn.cluster import DBSCAN
 from sklearn.feature_extraction.text import TfidfVectorizer
@@ -142,12 +141,11 @@ class PromptProcessor:
         current_prompt = self._load_current_prompt()
 
         # Format insights for synthesis
-        insights_text = "\n\n".join(
-            [
-                f"Insight {i+1} (supported by {insight['support_count']} cases):\n{insight['insight']}"
-                for i, insight in enumerate(insights)
-            ]
-        )
+        insight_lines = []
+        for i, insight in enumerate(insights):
+            insight_text = f"Insight {i+1} (supported by {insight['support_count']} cases):\n{insight['insight']}"
+            insight_lines.append(insight_text)
+        insights_text = "\n\n".join(insight_lines)
 
         # Create synthesis prompt
         synthesis_prompt = f"""

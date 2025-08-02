@@ -5,10 +5,7 @@ This module provides the main Settings class that combines all configuration
 components and handles loading from environment variables and files.
 """
 
-import os
 from functools import lru_cache
-from pathlib import Path
-from typing import Optional
 
 from pydantic import BaseSettings, Field
 
@@ -30,28 +27,16 @@ class Settings(BaseSettings):
     """
 
     # Environment and application settings
-    environment: str = Field(
-        default="development", description="Application environment"
-    )
+    environment: str = Field(default="development", description="Application environment")
     debug: bool = Field(default=False, description="Enable debug mode")
     log_level: str = Field(default="INFO", description="Logging level")
 
     # Configuration components
-    model: ModelConfig = Field(
-        default_factory=ModelConfig, description="Model configuration"
-    )
-    evaluation: EvaluationConfig = Field(
-        default_factory=EvaluationConfig, description="Evaluation configuration"
-    )
-    storage: StorageConfig = Field(
-        default_factory=StorageConfig, description="Storage configuration"
-    )
-    learning: LearningConfig = Field(
-        default_factory=LearningConfig, description="Learning configuration"
-    )
-    benchmark: BenchmarkConfig = Field(
-        default_factory=BenchmarkConfig, description="Benchmark configuration"
-    )
+    model: ModelConfig = Field(default_factory=ModelConfig, description="Model configuration")
+    evaluation: EvaluationConfig = Field(default_factory=EvaluationConfig, description="Evaluation configuration")
+    storage: StorageConfig = Field(default_factory=StorageConfig, description="Storage configuration")
+    learning: LearningConfig = Field(default_factory=LearningConfig, description="Learning configuration")
+    benchmark: BenchmarkConfig = Field(default_factory=BenchmarkConfig, description="Benchmark configuration")
 
     class Config:
         """Pydantic configuration."""
@@ -87,9 +72,7 @@ class Settings(BaseSettings):
             raise ValueError("OpenAI API key is required when using OpenAI models")
 
         if self.model.model_type.value == "anthropic" and not self.model.api_key:
-            raise ValueError(
-                "Anthropic API key is required when using Anthropic models"
-            )
+            raise ValueError("Anthropic API key is required when using Anthropic models")
 
     def get_model_config(self) -> ModelConfig:
         """Get model configuration."""

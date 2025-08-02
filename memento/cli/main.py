@@ -5,7 +5,6 @@ This module provides the main CLI entry point for running experiments,
 managing the framework, and accessing various features.
 """
 
-import sys
 import time
 from pathlib import Path
 from typing import Optional
@@ -24,7 +23,7 @@ from ..utils.logger import get_logger, setup_logger
 # Create Typer app
 app = typer.Typer(
     name="memento",
-    help="A Meta-Cognitive Framework for Self-Evolving System Prompts in AI Systems",
+    help=("A Meta-Cognitive Framework for Self-Evolving System Prompts in AI Systems"),
     add_completion=False,
 )
 
@@ -50,9 +49,7 @@ def version():
 
 @app.command()
 def init(
-    config_file: Optional[Path] = typer.Option(
-        None, "--config", "-c", help="Path to configuration file"
-    ),
+    config_file: Optional[Path] = typer.Option(None, "--config", "-c", help="Path to configuration file"),
     model: str = typer.Option("codellama", "--model", "-m", help="Model to use"),
     log_level: str = typer.Option("INFO", "--log-level", "-l", help="Logging level"),
 ):
@@ -85,15 +82,15 @@ def init(
             task = progress.add_task("Initializing components...", total=3)
 
             # Initialize learner
-            learner = PromptLearner(model=model)
+            _ = PromptLearner(model=model)
             progress.update(task, advance=1)
 
             # Initialize collector
-            collector = FeedbackCollector(model=model)
+            _ = FeedbackCollector(model=model)
             progress.update(task, advance=1)
 
             # Initialize processor
-            processor = PromptProcessor(model=model)
+            _ = PromptProcessor(model=model)
             progress.update(task, advance=1)
 
         console.print("✅ Memento framework initialized successfully!", style="green")
@@ -109,12 +106,8 @@ def init(
 def run(
     problem_file: Path = typer.Argument(..., help="Path to problem file"),
     model: str = typer.Option("codellama", "--model", "-m", help="Model to use"),
-    iterations: int = typer.Option(
-        10, "--iterations", "-i", help="Number of iterations"
-    ),
-    output_dir: Optional[Path] = typer.Option(
-        None, "--output", "-o", help="Output directory"
-    ),
+    iterations: int = typer.Option(10, "--iterations", "-i", help="Number of iterations"),
+    output_dir: Optional[Path] = typer.Option(None, "--output", "-o", help="Output directory"),
 ):
     """Run a learning experiment."""
     try:
@@ -126,12 +119,12 @@ def run(
             raise FileNotFoundError(f"Problem file not found: {problem_file}")
 
         with open(problem_file, "r") as f:
-            problem_data = f.read()
+            _ = f.read()
 
         # Initialize components
-        learner = PromptLearner(model=model)
-        collector = FeedbackCollector(model=model)
-        processor = PromptProcessor(model=model)
+        _ = PromptLearner(model=model)
+        _ = FeedbackCollector(model=model)
+        _ = PromptProcessor(model=model)
 
         # Run experiment
         with Progress(
@@ -167,9 +160,7 @@ def benchmark(
         "-m",
         help="Models to benchmark",
     ),
-    output_file: Optional[Path] = typer.Option(
-        None, "--output", "-o", help="Output file"
-    ),
+    output_file: Optional[Path] = typer.Option(None, "--output", "-o", help="Output file"),
 ):
     """Run benchmark comparison."""
     try:
@@ -212,9 +203,7 @@ def status():
             table.add_row(name, status, str(path))
 
         # Check model configuration
-        model_status = (
-            "✅ Configured" if settings.model.model_name else "❌ Not configured"
-        )
+        model_status = "✅ Configured" if settings.model.model_name else "❌ Not configured"
         table.add_row("Model", model_status, settings.model.model_name)
 
         console.print(table)

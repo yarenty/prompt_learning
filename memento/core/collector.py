@@ -5,7 +5,7 @@ Feedback collection system for gathering and evaluating solution quality and ref
 import json
 from datetime import datetime
 from pathlib import Path
-from typing import Dict, List, Optional, Tuple
+from typing import Dict, List
 
 import ollama
 
@@ -16,9 +16,7 @@ class FeedbackCollector:
         self.storage_path.mkdir(parents=True, exist_ok=True)
         self.model = model
 
-    def collect_solution_feedback(
-        self, problem: str, solution: str, evaluation_criteria: List[str]
-    ) -> Dict:
+    def collect_solution_feedback(self, problem: str, solution: str, evaluation_criteria: List[str]) -> Dict:
         """
         Collect feedback for a solution including quality metrics and reflections.
 
@@ -41,12 +39,11 @@ class FeedbackCollector:
         self._store_feedback(feedback)
         return feedback
 
-    def _evaluate_solution(
-        self, solution: str, criteria: List[str]
-    ) -> Dict[str, float]:
+    def _evaluate_solution(self, solution: str, criteria: List[str]) -> Dict[str, float]:
         """Evaluate solution quality against given criteria."""
+        criteria_str = ", ".join(criteria)
         evaluation_prompt = f"""
-        Evaluate the following code solution against these criteria: {', '.join(criteria)}
+        Evaluate the following code solution against these criteria: {criteria_str}
         For each criterion, provide a score between 0.0 and 1.0.
         
         Solution:
@@ -56,14 +53,9 @@ class FeedbackCollector:
         """
 
         try:
-            response = ollama.generate(
-                model=self.model, prompt=evaluation_prompt, format="json"
-            )
+            response = ollama.generate(model=self.model, prompt=evaluation_prompt, format="json")
             evaluation = json.loads(response.response)
-            return {
-                criterion: float(evaluation.get(criterion, 0.0))
-                for criterion in criteria
-            }
+            return {criterion: float(evaluation.get(criterion, 0.0)) for criterion in criteria}
         except Exception as e:
             print(f"Error in evaluation: {e}")
             return {criterion: 0.0 for criterion in criteria}

@@ -6,7 +6,7 @@ This module defines the data models used for configuration management.
 
 from enum import Enum
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import List, Optional
 
 from pydantic import BaseModel, Field, validator
 
@@ -31,24 +31,12 @@ class EvaluationBackend(str, Enum):
 class ModelConfig(BaseModel):
     """Configuration for LLM models."""
 
-    model_type: ModelType = Field(
-        default=ModelType.OLLAMA, description="Type of model to use"
-    )
-    model_name: str = Field(
-        default="codellama", description="Name of the specific model"
-    )
-    api_key: Optional[str] = Field(
-        default=None, description="API key for the model service"
-    )
-    base_url: Optional[str] = Field(
-        default=None, description="Base URL for the model service"
-    )
-    temperature: float = Field(
-        default=0.7, ge=0.0, le=2.0, description="Sampling temperature"
-    )
-    max_tokens: int = Field(
-        default=2048, ge=1, description="Maximum tokens to generate"
-    )
+    model_type: ModelType = Field(default=ModelType.OLLAMA, description="Type of model to use")
+    model_name: str = Field(default="codellama", description="Name of the specific model")
+    api_key: Optional[str] = Field(default=None, description="API key for the model service")
+    base_url: Optional[str] = Field(default=None, description="Base URL for the model service")
+    temperature: float = Field(default=0.7, ge=0.0, le=2.0, description="Sampling temperature")
+    max_tokens: int = Field(default=2048, ge=1, description="Maximum tokens to generate")
     timeout: int = Field(default=30, ge=1, description="Request timeout in seconds")
 
     @validator("model_name")
@@ -66,13 +54,9 @@ class EvaluationConfig(BaseModel):
         default=["correctness", "efficiency", "readability", "maintainability"],
         description="Evaluation criteria to use",
     )
-    backend: EvaluationBackend = Field(
-        default=EvaluationBackend.LLM, description="Evaluation backend to use"
-    )
+    backend: EvaluationBackend = Field(default=EvaluationBackend.LLM, description="Evaluation backend to use")
     batch_size: int = Field(default=10, ge=1, description="Batch size for evaluations")
-    cache_results: bool = Field(
-        default=True, description="Whether to cache evaluation results"
-    )
+    cache_results: bool = Field(default=True, description="Whether to cache evaluation results")
     cache_ttl: int = Field(default=3600, description="Cache TTL in seconds")
 
     @validator("criteria")
@@ -86,19 +70,11 @@ class EvaluationConfig(BaseModel):
 class StorageConfig(BaseModel):
     """Configuration for data storage."""
 
-    base_path: Path = Field(
-        default=Path("data"), description="Base path for data storage"
-    )
-    feedback_path: Path = Field(
-        default=Path("data/feedback"), description="Path for feedback data"
-    )
-    evolution_path: Path = Field(
-        default=Path("data/evolution"), description="Path for evolution data"
-    )
+    base_path: Path = Field(default=Path("data"), description="Base path for data storage")
+    feedback_path: Path = Field(default=Path("data/feedback"), description="Path for feedback data")
+    evolution_path: Path = Field(default=Path("data/evolution"), description="Path for evolution data")
     logs_path: Path = Field(default=Path("logs"), description="Path for log files")
-    cache_path: Path = Field(
-        default=Path("data/cache"), description="Path for cache data"
-    )
+    cache_path: Path = Field(default=Path("data/cache"), description="Path for cache data")
 
     @validator(
         "base_path",
@@ -118,9 +94,7 @@ class StorageConfig(BaseModel):
 class LearningConfig(BaseModel):
     """Configuration for learning parameters."""
 
-    max_iterations: int = Field(
-        default=50, ge=1, description="Maximum learning iterations"
-    )
+    max_iterations: int = Field(default=50, ge=1, description="Maximum learning iterations")
     convergence_threshold: float = Field(
         default=0.01, ge=0.0, le=1.0, description="Threshold for convergence detection"
     )
@@ -152,12 +126,8 @@ class BenchmarkConfig(BaseModel):
         default=["promptbreeder", "self-evolving-gpt", "auto-evolve"],
         description="Baseline models to compare against",
     )
-    dataset_path: Path = Field(
-        default=Path("data/datasets"), description="Path to benchmark datasets"
-    )
-    results_path: Path = Field(
-        default=Path("results"), description="Path for benchmark results"
-    )
+    dataset_path: Path = Field(default=Path("data/datasets"), description="Path to benchmark datasets")
+    results_path: Path = Field(default=Path("results"), description="Path for benchmark results")
     statistical_significance_level: float = Field(
         default=0.05,
         ge=0.0,

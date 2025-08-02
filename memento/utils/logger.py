@@ -10,7 +10,7 @@ import logging
 import sys
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, Optional
+from typing import Any, Optional
 
 from ..config import get_settings
 
@@ -104,11 +104,9 @@ def setup_logger(
         console_formatter = JSONFormatter()
     else:
         formatter = logging.Formatter(
-            "%(asctime)s - %(name)s - %(levelname)s - %(module)s:%(funcName)s:%(lineno)d - %(message)s"
+            "%(asctime)s - %(name)s - %(levelname)s - " "%(module)s:%(funcName)s:%(lineno)d - %(message)s"
         )
-        console_formatter = ColoredFormatter(
-            "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
-        )
+        console_formatter = ColoredFormatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
 
     # Console handler
     console_handler = logging.StreamHandler(sys.stdout)
@@ -143,9 +141,7 @@ def get_logger(name: str = "memento") -> logging.Logger:
     return logging.getLogger(name)
 
 
-def log_with_context(
-    logger: logging.Logger, level: str, message: str, **context: Any
-) -> None:
+def log_with_context(logger: logging.Logger, level: str, message: str, **context: Any) -> None:
     """
     Log a message with additional context.
 
@@ -156,9 +152,7 @@ def log_with_context(
         **context: Additional context fields
     """
     # Create a custom log record with extra fields
-    record = logger.makeRecord(
-        logger.name, getattr(logging, level.upper()), "", 0, message, (), None
-    )
+    record = logger.makeRecord(logger.name, getattr(logging, level.upper()), "", 0, message, (), None)
 
     # Add extra fields
     record.extra_fields = context
@@ -173,9 +167,7 @@ class LoggerMixin:
     def __init__(self, *args, **kwargs):
         """Initialize the mixin."""
         super().__init__(*args, **kwargs)
-        self._logger = get_logger(
-            f"{self.__class__.__module__}.{self.__class__.__name__}"
-        )
+        self._logger = get_logger(f"{self.__class__.__module__}.{self.__class__.__name__}")
 
     @property
     def logger(self) -> logging.Logger:
