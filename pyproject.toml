@@ -19,7 +19,8 @@ keywords = [
     "machine-learning", "artificial-intelligence", "nlp"
 ]
 classifiers = [
-    "Development Status :: 3 - Alpha",
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
     "Intended Audience :: Science/Research",
     "License :: OSI Approved :: MIT License",
     "Operating System :: OS Independent",
@@ -38,6 +39,7 @@ dependencies = [
     "scipy>=1.7.0",
     "pydantic>=2.0.0",
     "pydantic-settings>=2.0.0",
+    "datasets>=4.0.0",
     "ollama>=0.1.0",
     "openai>=1.0.0",
     "anthropic>=0.7.0",
@@ -126,10 +128,14 @@ extend-exclude = '''
 
 [tool.isort]
 profile = "black"
-multi_line_output = 3
 line_length = 120
+multi_line_output = 3
+include_trailing_comma = true
+force_grid_wrap = 0
+use_parentheses = true
+ensure_newline_before_comments = true
 known_first_party = ["memento"]
-known_third_party = ["numpy", "pandas", "scikit-learn", "scipy", "pydantic", "pydantic_settings", "ollama"]
+known_third_party = ["numpy", "pandas", "scikit-learn", "scipy", "pydantic", "pydantic_settings", "datasets", "ollama"]
 
 [tool.flake8]
 max-line-length = 120
@@ -142,6 +148,7 @@ exclude = [
     ".venv",
     ".eggs",
     "*.egg",
+    "*.egg-info",
 ]
 
 [tool.mypy]
@@ -160,29 +167,19 @@ warn_unreachable = true
 strict_equality = true
 
 [[tool.mypy.overrides]]
-module = ["ollama.*", "openai.*", "anthropic.*", "redis.*", "sqlalchemy.*", "scipy.*"]
+module = ["ollama.*", "openai.*", "anthropic.*", "redis.*", "sqlalchemy.*", "scipy.*", "datasets.*"]
 ignore_missing_imports = true
 
 [tool.pytest.ini_options]
-minversion = "7.0"
-addopts = [
-    "--strict-markers",
-    "--strict-config",
-    # "--cov=memento",
-    # "--cov-report=term-missing",
-    # "--cov-report=html",
-    # "--cov-report=xml",
-    # "--cov-fail-under=90",
-]
 testpaths = ["tests"]
 python_files = ["test_*.py", "*_test.py"]
 python_classes = ["Test*"]
 python_functions = ["test_*"]
-markers = [
-    "slow: marks tests as slow (deselect with '-m \"not slow\"')",
-    "integration: marks tests as integration tests",
-    "unit: marks tests as unit tests",
-    "benchmark: marks tests as benchmark tests",
+# addopts = "--cov=memento --cov-report=html --cov-report=term-missing --cov-fail-under=80"
+asyncio_mode = "auto"
+filterwarnings = [
+    "ignore::UserWarning",
+    "ignore::DeprecationWarning",
 ]
 
 [tool.coverage.run]

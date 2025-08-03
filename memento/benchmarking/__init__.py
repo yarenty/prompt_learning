@@ -17,17 +17,17 @@ Components:
 from .baselines.auto_evolve import AutoEvolve
 
 # Baseline implementations for comparison
-from .baselines.prompt_breeder import PromptBreeder
+from .baselines.promptbreeder import PromptBreeder
 from .baselines.self_evolving_gpt import SelfEvolvingGPT
 
 # Core benchmarking framework
 from .evaluation.benchmark_runner import StandardBenchmarkRunner
 from .evaluation.metrics import EvaluationMetrics
 from .evaluation.statistical_analyzer import StatisticalAnalyzer
-from .visualization.comparison_plotter import ComparisonPlotter
 
-# Visualization and reporting
-from .visualization.results_visualizer import ResultsVisualizer
+# Visualization and reporting (TODO: Implement these modules)
+# from .visualization.results_visualizer import ResultsVisualizer
+# from .visualization.comparison_plotter import ComparisonPlotter
 
 __all__ = [
     # Main benchmarking framework (RECOMMENDED)
@@ -38,7 +38,7 @@ __all__ = [
     "PromptBreeder",
     "SelfEvolvingGPT",
     "AutoEvolve",
-    # Visualization tools
-    "ResultsVisualizer",
-    "ComparisonPlotter",
+    # Visualization tools (TODO: Implement)
+    # "ResultsVisualizer",
+    # "ComparisonPlotter",
 ]

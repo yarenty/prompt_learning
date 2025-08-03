@@ -69,7 +69,10 @@ class StandardBenchmarkRunner:
             model_config=model_config, storage_path=self.output_dir / "memento_storage"
         )
         self.prompt_processor = PromptProcessor(
-            model_config=model_config, storage_path=self.output_dir / "memento_storage"
+            model_config=model_config,
+            storage_path=self.output_dir / "memento_storage",
+            feedback_path=self.output_dir / "memento_storage" / "feedback",
+            prompt_path=self.output_dir / "memento_storage" / "prompts",
         )
 
     async def run_comprehensive_benchmark(self) -> Dict[str, Any]:

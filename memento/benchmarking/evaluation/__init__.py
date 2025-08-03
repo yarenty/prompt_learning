@@ -1,14 +1,17 @@
 """
-Evaluation framework for benchmarking prompt evolution methods.
+Professional Evaluation Framework
 
-This module provides:
-- BenchmarkRunner: Orchestrates comparison experiments
-- EvaluationMetrics: Standardized metrics for comparison
-- StatisticalAnalyzer: Statistical significance testing
+This module provides comprehensive evaluation capabilities for benchmarking
+Memento against standard datasets and baseline methods.
 """
 
-from .benchmark_runner import BenchmarkRunner
+# Import the main benchmark runner
+from .benchmark_runner import StandardBenchmarkRunner
 from .metrics import EvaluationMetrics
 from .statistical_analyzer import StatisticalAnalyzer
 
-__all__ = ["BenchmarkRunner", "EvaluationMetrics", "StatisticalAnalyzer"]
+__all__ = [
+    "StandardBenchmarkRunner",
+    "EvaluationMetrics",
+    "StatisticalAnalyzer",
+]
