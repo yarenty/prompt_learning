@@ -82,6 +82,17 @@ class DatasetLoader:
         logger.info(f"Loading {name} from source")
         dataset = await self.datasets[name]["load"](split=split, max_samples=max_samples, **kwargs)
 
+        # Handle DatasetDict vs Dataset
+        if isinstance(dataset, DatasetDict):
+            # If no split specified, use the first available split
+            if split is None:
+                split = list(dataset.keys())[0]
+            dataset = dataset[split]
+
+        # Apply max_samples if specified
+        if max_samples and hasattr(dataset, "select"):
+            dataset = dataset.select(range(min(max_samples, len(dataset))))
+
         # Save to cache
         self._save_to_cache(dataset, cache_path)
 
@@ -165,10 +176,6 @@ class DatasetLoader:
             Loaded dataset
         """
         dataset = datasets.load_dataset("openai/human-eval", split=split, use_auth_token=self.use_auth_token)
-
-        if max_samples:
-            dataset = dataset.select(range(min(max_samples, len(dataset))))
-
         return dataset
 
     async def _load_gsm8k(self, split: Optional[str] = None, max_samples: Optional[int] = None, **kwargs) -> Dataset:
@@ -183,10 +190,6 @@ class DatasetLoader:
             Loaded dataset
         """
         dataset = datasets.load_dataset("gsm8k", "main", split=split, use_auth_token=self.use_auth_token)
-
-        if max_samples:
-            dataset = dataset.select(range(min(max_samples, len(dataset))))
-
         return dataset
 
     async def _load_apps(self, split: Optional[str] = None, max_samples: Optional[int] = None, **kwargs) -> Dataset:
@@ -201,10 +204,6 @@ class DatasetLoader:
             Loaded dataset
         """
         dataset = datasets.load_dataset("codeparrot/apps", split=split, use_auth_token=self.use_auth_token)
-
-        if max_samples:
-            dataset = dataset.select(range(min(max_samples, len(dataset))))
-
         return dataset
 
     async def _load_mmlu_math(
@@ -221,10 +220,6 @@ class DatasetLoader:
             Loaded dataset
         """
         dataset = datasets.load_dataset("cais/mmlu", "mathematics", split=split, use_auth_token=self.use_auth_token)
-
-        if max_samples:
-            dataset = dataset.select(range(min(max_samples, len(dataset))))
-
         return dataset
 
     async def _load_writingbench(
@@ -241,8 +236,4 @@ class DatasetLoader:
             Loaded dataset
         """
         dataset = datasets.load_dataset("writing_bench", split=split, use_auth_token=self.use_auth_token)
-
-        if max_samples:
-            dataset = dataset.select(range(min(max_samples, len(dataset))))
-
         return dataset

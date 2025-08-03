@@ -160,14 +160,18 @@ class ModelEvaluator(LoggerMixin):
 
                 # Standardize sample format
                 if isinstance(item, dict):
+                    # Handle different dataset formats
+                    problem = item.get("problem", item.get("description", item.get("text", item.get("question", ""))))
+                    expected = item.get("expected", item.get("solution", item.get("answer", "")))
+                    
                     sample = {
                         "id": item.get("id", i),
-                        "problem": item.get("problem", item.get("description", item.get("text", ""))),
-                        "expected": item.get("expected", item.get("solution", item.get("answer", ""))),
+                        "problem": problem,
+                        "expected": expected,
                         "metadata": {
                             k: v
                             for k, v in item.items()
-                            if k not in ["id", "problem", "description", "text", "expected", "solution", "answer"]
+                            if k not in ["id", "problem", "description", "text", "question", "expected", "solution", "answer"]
                         },
                     }
                 else:
