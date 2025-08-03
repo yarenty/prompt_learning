@@ -153,7 +153,7 @@ def run(
 
 
 @app.command()
-def benchmark(
+def legacy_benchmark(
     dataset_path: Path = typer.Argument(..., help="Path to benchmark dataset"),
     models: list[str] = typer.Option(
         ["memento", "promptbreeder", "self-evolving-gpt", "auto-evolve"],
@@ -163,21 +163,21 @@ def benchmark(
     ),
     output_file: Optional[Path] = typer.Option(None, "--output", "-o", help="Output file"),
 ):
-    """Run benchmark comparison."""
+    """Run legacy benchmark comparison."""
     try:
         logger = get_logger("memento")
-        logger.info(f"Starting benchmark with models: {models}")
+        logger.info(f"Starting legacy benchmark with models: {models}")
 
         if not dataset_path.exists():
             raise FileNotFoundError(f"Dataset not found: {dataset_path}")
 
         # TODO: Implement benchmark logic
-        console.print("🔄 Benchmark functionality coming soon...", style="yellow")
-        logger.info("Benchmark completed")
+        console.print("🔄 Legacy benchmark functionality coming soon...", style="yellow")
+        logger.info("Legacy benchmark completed")
 
     except Exception as e:
-        console.print(f"❌ Error running benchmark: {e}", style="red")
-        logger.error(f"Benchmark failed: {e}")
+        console.print(f"❌ Error running legacy benchmark: {e}", style="red")
+        logger.error(f"Legacy benchmark failed: {e}")
         raise typer.Exit(1)
 
 
