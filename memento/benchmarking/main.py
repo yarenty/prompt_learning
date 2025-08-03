@@ -1,12 +1,13 @@
 """Main benchmark runner."""
 
-import asyncio
 import logging
 from datetime import datetime
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Union
 
-from ..core.metrics import MetricsCollector
+import numpy as np
+
+from ..utils.metrics import MetricsCollector
 from ..visualization.comparison import ComparisonVisualizer
 from ..visualization.results import ResultsVisualizer
 from ..visualization.statistical import StatisticalVisualizer
