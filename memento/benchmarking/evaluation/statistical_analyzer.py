@@ -96,13 +96,130 @@ class StatisticalAnalyzer:
 
         return effect_sizes
 
-    def _generate_summary(self, results: Dict[str, Any]) -> Dict[str, Any]:
-        """Generate summary statistics."""
-        best_method = max(results.keys(), key=lambda m: results[m]["mean_performance"])
+    def _generate_summary(self, results: Dict[str, Any]) -> str:
+        """Generate summary of statistical analysis."""
+        best_method = max(results.keys(), key=lambda k: results[k]["mean_performance"])
+        return f"Best performing method: {best_method} with mean performance {results[best_method]['mean_performance']:.3f}"
+
+    def calculate_descriptive_stats(self, performance_data: List[Dict[str, Any]]) -> Dict[str, Any]:
+        """Calculate descriptive statistics for performance data."""
+        if not performance_data:
+            return {"error": "No performance data provided"}
+
+        # Extract performance scores
+        scores = []
+        domains = set()
+
+        for data_point in performance_data:
+            if "performance" in data_point:
+                scores.append(data_point["performance"])
+            if "domain" in data_point:
+                domains.add(data_point["domain"])
+
+        if not scores:
+            return {"error": "No performance scores found in data"}
+
+        scores_array = np.array(scores)
 
         return {
-            "best_method": best_method,
-            "best_performance": results[best_method]["mean_performance"],
-            "total_methods": len(results),
-            "total_runs": sum(data["total_runs"] for data in results.values()),
+            "count": len(scores),
+            "mean": float(np.mean(scores_array)),
+            "std": float(np.std(scores_array)),
+            "min": float(np.min(scores_array)),
+            "max": float(np.max(scores_array)),
+            "median": float(np.median(scores_array)),
+            "q25": float(np.percentile(scores_array, 25)),
+            "q75": float(np.percentile(scores_array, 75)),
+            "domains_covered": list(domains),
+            "domain_count": len(domains),
         }
+
+    def analyze_by_domain(self, performance_data: List[Dict[str, Any]]) -> Dict[str, Any]:
+        """Analyze performance by domain."""
+        domain_stats = {}
+
+        for data_point in performance_data:
+            domain = data_point.get("domain", "unknown")
+            performance = data_point.get("performance", 0)
+
+            if domain not in domain_stats:
+                domain_stats[domain] = []
+            domain_stats[domain].append(performance)
+
+        # Calculate stats for each domain
+        domain_analysis = {}
+        for domain, scores in domain_stats.items():
+            scores_array = np.array(scores)
+            domain_analysis[domain] = {
+                "count": len(scores),
+                "mean": float(np.mean(scores_array)),
+                "std": float(np.std(scores_array)),
+                "min": float(np.min(scores_array)),
+                "max": float(np.max(scores_array)),
+            }
+
+        return domain_analysis
+
+    def calculate_confidence_intervals(
+        self, performance_data: List[Dict[str, Any]], confidence: float = 0.95
+    ) -> Dict[str, Any]:
+        """Calculate confidence intervals for performance data."""
+        scores = [d.get("performance", 0) for d in performance_data if "performance" in d]
+
+        if len(scores) < 2:
+            return {"error": "Need at least 2 data points for confidence intervals"}
+
+        scores_array = np.array(scores)
+        mean = np.mean(scores_array)
+        sem = stats.sem(scores_array)  # Standard error of the mean
+
+        # Calculate confidence interval
+        alpha = 1 - confidence
+        t_critical = stats.t.ppf(1 - alpha / 2, len(scores) - 1)
+        margin_of_error = t_critical * sem
+
+        return {
+            "mean": float(mean),
+            "confidence_level": confidence,
+            "lower_bound": float(mean - margin_of_error),
+            "upper_bound": float(mean + margin_of_error),
+            "margin_of_error": float(margin_of_error),
+            "sample_size": len(scores),
+        }
+
+    def calculate_effect_sizes(self, performance_data: List[Dict[str, Any]]) -> Dict[str, Any]:
+        """Calculate effect sizes (Cohen's d) for method comparisons."""
+        # Group data by method if available
+        method_scores = {}
+
+        for data_point in performance_data:
+            method = data_point.get("method", "unknown")
+            performance = data_point.get("performance", 0)
+
+            if method not in method_scores:
+                method_scores[method] = []
+            method_scores[method].append(performance)
+
+        if len(method_scores) < 2:
+            return {"error": "Need at least 2 methods for effect size calculation"}
+
+        methods = list(method_scores.keys())
+        effect_sizes = {}
+
+        # Calculate pairwise effect sizes
+        for i, method1 in enumerate(methods):
+            for method2 in methods[i + 1 :]:
+                scores1 = np.array(method_scores[method1])
+                scores2 = np.array(method_scores[method2])
+
+                # Cohen's d
+                pooled_std = np.sqrt(
+                    ((len(scores1) - 1) * np.var(scores1, ddof=1) + (len(scores2) - 1) * np.var(scores2, ddof=1))
+                    / (len(scores1) + len(scores2) - 2)
+                )
+
+                if pooled_std > 0:
+                    cohens_d = (np.mean(scores1) - np.mean(scores2)) / pooled_std
+                    effect_sizes[f"{method1} vs {method2}"] = float(cohens_d)
+
+        return effect_sizes
