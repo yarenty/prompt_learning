@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Memento Benchmark Report</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <style>
+        .metric-card {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 10px;
+        }
+        .best-model {
+            background-color: #e3f2fd;
+        }
+        .plot-container {
+            margin: 20px 0;
+            padding: 10px;
+            border: 1px solid #eee;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container mt-5">
+        <h1 class="mb-4">Memento Benchmark Report</h1>
+        
+        <!-- Configuration -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h4>Configuration</h4>
+            </div>
+            <div class="card-body">
+                <table class="table">
+                    <tr>
+                        <th>Datasets</th>
+                        <td>{{ config.get('datasets', []) | join(', ') }}</td>
+                    </tr>
+                    <tr>
+                        <th>Models</th>
+                        <td>{{ config.get('models', []) | join(', ') }}</td>
+                    </tr>
+                    <tr>
+                        <th>Output Directory</th>
+                        <td>{{ config.get('output_dir', '') }}</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+        
+        <!-- Summary -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h4>Summary</h4>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="metric-card">
+                            <h5>Datasets</h5>
+                            <p class="h3">{{ summary.datasets }}</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="metric-card">
+                            <h5>Models</h5>
+                            <p class="h3">{{ summary.models }}</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <h5 class="mt-4">Best Models</h5>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Metric</th>
+                            <th>Model</th>
+                            <th>Dataset</th>
+                            <th>Score</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for metric, data in summary.best_model.items() %}
+                        <tr>
+                            <td>{{ metric }}</td>
+                            <td>{{ data.model }}</td>
+                            <td>{{ data.dataset }}</td>
+                            <td>{{ "%.3f"|format(data.score) }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                
+                <h5 class="mt-4">Metric Statistics</h5>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Metric</th>
+                            <th>Min</th>
+                            <th>Max</th>
+                            <th>Average</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for metric, stats in summary.metrics.items() %}
+                        <tr>
+                            <td>{{ metric }}</td>
+                            <td>{{ "%.3f"|format(stats.min) }}</td>
+                            <td>{{ "%.3f"|format(stats.max) }}</td>
+                            <td>{{ "%.3f"|format(stats.avg) }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+        <!-- Plots -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h4>Visualizations</h4>
+            </div>
+            <div class="card-body">
+                <div class="plot-container">
+                    <h5>Performance Comparison</h5>
+                    <iframe src="{{ plots.performance }}" width="100%" height="600px" frameborder="0"></iframe>
+                </div>
+                
+                <div class="plot-container">
+                    <h5>Learning Curves</h5>
+                    <iframe src="{{ plots.learning }}" width="100%" height="600px" frameborder="0"></iframe>
+                </div>
+                
+                <div class="plot-container">
+                    <h5>Error Analysis</h5>
+                    <iframe src="{{ plots.errors }}" width="100%" height="600px" frameborder="0"></iframe>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Detailed Results -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h4>Detailed Results</h4>
+            </div>
+            <div class="card-body">
+                {% for dataset_model, scores in results.items() %}
+                <div class="metric-card {% if dataset_model in summary.best_model.values() %}best-model{% endif %}">
+                    <h5>{{ dataset_model }}</h5>
+                    <table class="table table-sm">
+                        <tbody>
+                            {% for metric, score in scores.items() %}
+                            {% if metric != "history" and metric != "errors" %}
+                            <tr>
+                                <td>{{ metric }}</td>
+                                <td>{{ "%.3f"|format(score) if score is number else score }}</td>
+                            </tr>
+                            {% endif %}
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html> 

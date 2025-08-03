@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Method Comparison Report</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <style>
+        .method-card {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 10px;
+            background-color: #fff;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .baseline-card {
+            border-color: #2E8B57;
+            background-color: #f8fff8;
+        }
+        
+        .plot-container {
+            margin: 20px 0;
+            padding: 15px;
+            border: 1px solid #eee;
+            border-radius: 8px;
+            background-color: #fff;
+        }
+        
+        .section-title {
+            font-size: 24px;
+            font-weight: bold;
+            margin: 30px 0 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #2E8B57;
+        }
+        
+        .metric-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #2E8B57;
+            margin: 15px 0;
+        }
+        
+        .method-title {
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        
+        .stats-table {
+            width: 100%;
+            margin: 15px 0;
+        }
+        
+        .stats-table th {
+            background-color: #f8f9fa;
+            font-weight: 600;
+        }
+        
+        .improvement {
+            font-size: 16px;
+            font-weight: 600;
+            margin: 10px 0;
+        }
+        
+        .improvement.positive {
+            color: #2E8B57;
+        }
+        
+        .improvement.negative {
+            color: #DC143C;
+        }
+        
+        .significance {
+            font-size: 14px;
+            color: #666;
+        }
+        
+        .significance .star {
+            color: #FFD700;
+            font-size: 16px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid py-4">
+        <h1 class="text-center mb-4">Method Comparison Report</h1>
+        
+        <!-- Method Overview -->
+        <div class="section-title">Method Overview</div>
+        <div class="row">
+            <!-- Baseline Method -->
+            <div class="col-md-6">
+                <div class="method-card baseline-card">
+                    <h3 class="method-title">{{ baseline }} (Baseline)</h3>
+                    <table class="table stats-table">
+                        {% for metric in metrics %}
+                        <tr>
+                            <th>{{ metric }}</th>
+                            <td>
+                                Mean: {{ "%.3f"|format(results[baseline][metric]|mean) }}<br>
+                                Std: {{ "%.3f"|format(results[baseline][metric]|std) }}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </table>
+                </div>
+            </div>
+            
+            <!-- Other Methods -->
+            {% for method in results.keys() if method != baseline %}
+            <div class="col-md-6">
+                <div class="method-card">
+                    <h3 class="method-title">{{ method }}</h3>
+                    <table class="table stats-table">
+                        {% for metric in metrics %}
+                        {% if metric in results[method] %}
+                        <tr>
+                            <th>{{ metric }}</th>
+                            <td>
+                                Mean: {{ "%.3f"|format(results[method][metric]|mean) }}<br>
+                                Std: {{ "%.3f"|format(results[method][metric]|std) }}
+                                {% set improvement = ((results[method][metric]|mean - results[baseline][metric]|mean) / results[baseline][metric]|mean * 100) %}
+                                <div class="improvement {{ 'positive' if improvement > 0 else 'negative' }}">
+                                    {{ "%+.1f"|format(improvement) }}%
+                                </div>
+                            </td>
+                        </tr>
+                        {% endif %}
+                        {% endfor %}
+                    </table>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        
+        <!-- Metric Comparisons -->
+        <div class="section-title">Metric Comparisons</div>
+        {% for metric in metrics %}
+        <div class="metric-title">{{ metric }}</div>
+        <div class="plot-container">
+            <iframe src="{{ plot_paths['comparison_' + metric] }}" width="100%" height="500px" frameborder="0"></iframe>
+        </div>
+        {% endfor %}
+        
+        <!-- Improvement Analysis -->
+        <div class="section-title">Improvement Analysis</div>
+        {% for method in results.keys() if method != baseline %}
+        <div class="metric-title">{{ method }} vs {{ baseline }}</div>
+        <div class="plot-container">
+            <iframe src="{{ plot_paths['heatmap_' + method] }}" width="100%" height="500px" frameborder="0"></iframe>
+        </div>
+        {% endfor %}
+        
+        <!-- Statistical Analysis -->
+        <div class="section-title">Statistical Analysis</div>
+        {% for method in results.keys() if method != baseline %}
+        <div class="method-card">
+            <h3 class="method-title">{{ method }} vs {{ baseline }}</h3>
+            {% for metric in metrics %}
+            {% if metric in results[method] and metric in results[baseline] %}
+            <div class="metric-title">{{ metric }}</div>
+            <div class="plot-container">
+                <iframe src="{{ plot_paths['stats_' + method + '_' + metric] }}" width="100%" height="600px" frameborder="0"></iframe>
+            </div>
+            {% endif %}
+            {% endfor %}
+        </div>
+        {% endfor %}
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html> 

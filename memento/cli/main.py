@@ -19,6 +19,7 @@ from ..core.collector import FeedbackCollector
 from ..core.learner import PromptLearner
 from ..core.processor import PromptProcessor
 from ..utils.logger import get_logger, setup_logger
+from .comprehensive_benchmark import benchmark
 
 # Create Typer app
 app = typer.Typer(
@@ -265,6 +266,10 @@ def clean(
     except Exception as e:
         console.print(f"❌ Error cleaning data: {e}", style="red")
         raise typer.Exit(1)
+
+
+# Add benchmark subcommand group
+app.add_typer(benchmark, name="benchmark", help="Comprehensive benchmarking commands")
 
 
 def main():

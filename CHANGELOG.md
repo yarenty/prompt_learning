@@ -1,8 +1,53 @@
 # Changelog
 
-## [0.4.0] - Core Module Enhancements
+All notable changes to the Memento framework will be documented in this file.
 
-### Enhanced FeedbackCollector
+## [0.5.0] - 2025-08-03
+
+### Added - Visualization Framework
+- **Results Visualization Module**: Comprehensive visualization capabilities for benchmark results
+  - Performance comparison charts with statistical annotations
+  - Statistical significance plots with p-values and effect sizes
+  - Multi-domain radar charts for comprehensive analysis
+  - Evolution trajectory plots showing improvement over iterations
+  - Publication-ready figure generation in multiple formats (PNG, PDF, SVG, EPS)
+
+- **Comparison Plotting Framework**: Detailed comparative analysis visualizations
+  - Method comparison box plots with statistical significance testing
+  - Improvement heatmaps showing percentage gains across datasets
+  - Confidence interval plots with error bars and uncertainty visualization
+  - Effect size magnitude charts with Cohen's d interpretation
+  - Dataset difficulty analysis plots
+  - Statistical power analysis visualizations
+
+- **Reporting System**: Automated report generation capabilities
+  - Comprehensive HTML reports with embedded visualizations
+  - Publication-ready figure exports for research papers
+  - Interactive dashboards for presentations
+  - Professional styling and themes for consistency
+  - Automated statistical summaries and interpretations
+
+- **Integration Enhancements**: Seamless integration with benchmarking framework
+  - Direct integration with StandardBenchmarkRunner
+  - Automatic visualization generation during benchmarks
+  - Configurable output formats and styling options
+  - Professional color schemes and layout templates
+
+### Technical Improvements
+- Added matplotlib, seaborn, and plotly as core dependencies
+- Implemented professional plotting themes and styling
+- Created comprehensive visualization demo showcasing all capabilities
+- Fixed seaborn compatibility warnings and matplotlib parameter issues
+- Added support for multiple export formats for publication use
+
+### Dependencies
+- Added `matplotlib>=3.5.0` for core plotting functionality
+- Added `seaborn>=0.11.0` for statistical visualizations
+- Added `plotly>=5.0.0` for interactive charts (future use)
+
+## [0.4.0] - 2025-08-02
+
+### Enhanced - Core Module Enhancements
 - **Async Support**: All LLM operations now use async/await for better performance and concurrency
 - **Multiple Evaluation Backends**: LLM, automated heuristics, and human evaluation support
 - **Intelligent Caching**: Evaluation and reflection results cached to reduce redundant LLM calls
