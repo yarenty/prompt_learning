@@ -163,7 +163,7 @@ class ModelEvaluator(LoggerMixin):
                     # Handle different dataset formats
                     problem = item.get("problem", item.get("description", item.get("text", item.get("question", ""))))
                     expected = item.get("expected", item.get("solution", item.get("answer", "")))
-                    
+
                     sample = {
                         "id": item.get("id", i),
                         "problem": problem,
@@ -171,7 +171,17 @@ class ModelEvaluator(LoggerMixin):
                         "metadata": {
                             k: v
                             for k, v in item.items()
-                            if k not in ["id", "problem", "description", "text", "question", "expected", "solution", "answer"]
+                            if k
+                            not in [
+                                "id",
+                                "problem",
+                                "description",
+                                "text",
+                                "question",
+                                "expected",
+                                "solution",
+                                "answer",
+                            ]
                         },
                     }
                 else:
@@ -291,29 +301,83 @@ class ModelEvaluator(LoggerMixin):
 
     async def _evaluate_with_memento(self, model: PromptLearner, sample: Dict[str, Any], **kwargs) -> str:
         """Evaluate sample with Memento."""
-        # Use Memento's prompt evolution capabilities
+        # Use Memento's prompt evolution capabilities to evolve the system prompt
         problem = {"description": sample["problem"], "solution": sample.get("expected", "")}
 
-        # Create a simple evaluation criteria (using valid criteria from validation)
+        # Create evaluation criteria for prompt evolution
         evaluation_criteria = ["correctness", "clarity", "readability"]
 
         try:
-            # Evaluate current prompt performance
+            # Step 1: Evaluate current prompt performance
+            self.logger.info(f"Evaluating current prompt performance for sample {sample['id']}")
             evaluation_results = await model.evaluate_prompt_performance(
                 prompt="You are a helpful assistant that solves problems step by step.",
                 problem=problem,
                 evaluation_criteria=evaluation_criteria,
             )
 
-            # Extract lessons and evolve the prompt
+            # Step 2: Extract lessons from evaluation
             lessons = self._extract_lessons_from_evaluation(evaluation_results)
+            self.logger.info(f"Extracted {len(lessons)} lessons from evaluation")
+
+            # Step 3: Evolve the prompt based on lessons
+            current_prompt = "You are a helpful assistant that solves problems step by step."
             evolved_prompt = await model.evolve_prompt(
-                current_prompt="You are a helpful assistant that solves problems step by step.", lessons=lessons
+                current_prompt=current_prompt, 
+                lessons=lessons
+            )
+            
+            self.logger.info(f"Evolved prompt for sample {sample['id']}")
+
+            # Step 4: Save the evolved prompt for comparison
+            # Store the evolved prompt in the model's storage for later analysis
+            await model.save_evolution_step(
+                prompt_type="system_prompt",
+                current_prompt=current_prompt,
+                updated_prompt=evolved_prompt,
+                evaluation_results=[evaluation_results]
             )
 
-            # For now, return the evolved prompt as the response
-            # In a full implementation, we would use the evolved prompt to generate a response
-            return f"Evolved prompt: {evolved_prompt}\n\nProblem: {sample['problem']}\n\nSolution approach: Use the evolved prompt to solve this problem step by step."
+            # Step 5: Use the evolved prompt to generate a response
+            # Create a prompt that uses the evolved system prompt
+            final_prompt = f"""{evolved_prompt}
+
+Problem: {sample['problem']}
+
+Please solve this problem step by step and provide the final answer."""
+
+            # Generate response using the evolved prompt
+            import ollama
+            
+            model_name = self.model_config.model_name
+            temperature = self.model_config.temperature
+            max_tokens = self.model_config.max_tokens
+            
+            response = ollama.chat(
+                model=model_name,
+                messages=[{"role": "user", "content": final_prompt}],
+                options={
+                    "temperature": temperature,
+                    "num_predict": max_tokens
+                }
+            )
+            
+            # Extract the response content
+            if response and "message" in response:
+                generated_response = response["message"]["content"]
+                
+                # Return both the evolved prompt and the generated response
+                return f"""Evolved System Prompt:
+{evolved_prompt}
+
+Generated Response:
+{generated_response}"""
+            else:
+                return f"""Evolved System Prompt:
+{evolved_prompt}
+
+Generated Response:
+[Failed to generate response]"""
 
         except Exception as e:
             self.logger.warning(f"Memento evaluation failed: {e}")
