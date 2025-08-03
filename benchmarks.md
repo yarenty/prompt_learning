@@ -10,6 +10,12 @@ python -m memento.cli.main benchmark run --datasets humaneval gsm8k --models mem
 
 # Generate report from results
 python -m memento.cli.main benchmark report --input-dir benchmark_results
+
+
+
+python -m memento.cli benchmark run --datasets gsm8k --models memento --max-samples 1 --no-dashboard --model-name llama3.2
+
+python -m memento.cli benchmark run --datasets gsm8k --models memento --max-samples 5 --model-name llama3.2
 ```
 
 ## Detailed Guide
