@@ -1,9 +1,7 @@
 """Real-time monitoring dashboard."""
 
-import asyncio
 from datetime import datetime
-from pathlib import Path
-from typing import Any, Callable, Dict, List, Optional
+from typing import Dict, List
 
 import dash
 import plotly.graph_objects as go
@@ -180,7 +178,7 @@ class DashboardServer:
 
     async def start(self):
         """Start dashboard server."""
-        self.app.run_server(host=self.host, port=self.port, debug=False)
+        self.app.run(host=self.host, port=self.port, debug=False)
 
     async def stop(self):
         """Stop dashboard server."""
