@@ -104,7 +104,11 @@ class StandardDatasetManager:
 
         try:
             # Load using HuggingFace datasets
-            dataset = load_dataset(dataset_info["source"], split=split, cache_dir=str(self.cache_dir))
+            # Handle special cases for datasets that need config
+            if dataset_name == "gsm8k":
+                dataset = load_dataset(dataset_info["source"], "main", split=split, cache_dir=str(self.cache_dir))
+            else:
+                dataset = load_dataset(dataset_info["source"], split=split, cache_dir=str(self.cache_dir))
 
             # Convert to list of dictionaries
             if hasattr(dataset, "to_pandas"):

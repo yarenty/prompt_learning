@@ -470,6 +470,7 @@ class ComprehensiveBenchmark(LoggerMixin):
             # Extract key metrics for compatibility
             basic_metrics = results.get("basic_metrics", {})
             task_metrics = results.get("task_metrics", {})
+            responses = results.get("responses", [])
 
             return {
                 "accuracy": basic_metrics.get("accuracy", 0.0),
@@ -479,6 +480,9 @@ class ComprehensiveBenchmark(LoggerMixin):
                 "task_metrics": task_metrics,
                 "evaluation_time": results.get("evaluation_time", 0),
                 "task_type": results.get("task_type", "unknown"),
+                "responses": responses,  # Include the actual responses
+                "processing_time": results.get("evaluation_time", 0),
+                "samples_processed": basic_metrics.get("total_samples", 0),
             }
         except Exception as e:
             self.logger.error(f"Failed to evaluate {model_name}: {e}")
@@ -749,9 +753,9 @@ class ComprehensiveBenchmark(LoggerMixin):
     async def _extract_evolved_prompts(self, results: Dict[str, Any]):
         """Extract and save evolved prompts for comparison."""
         self.logger.info("Extracting evolved prompts for comparison")
-        
+
         evolved_prompts = {}
-        
+
         # Extract prompts from Memento responses
         for dataset_name, dataset_results in results.get("dataset_results", {}).items():
             for model_name, model_results in dataset_results.items():
@@ -763,27 +767,31 @@ class ComprehensiveBenchmark(LoggerMixin):
                             # Extract the evolved prompt
                             response_text = response.get("response", "")
                             if "Evolved System Prompt:" in response_text:
-                                prompt_start = response_text.find("Evolved System Prompt:") + len("Evolved System Prompt:")
+                                prompt_start = response_text.find("Evolved System Prompt:") + len(
+                                    "Evolved System Prompt:"
+                                )
                                 prompt_end = response_text.find("Generated Response:")
                                 if prompt_end > prompt_start:
                                     evolved_prompt = response_text[prompt_start:prompt_end].strip()
-                                    evolved_prompts[f"memento_{dataset_name}_{response.get('sample_id', 'unknown')}"] = {
+                                    evolved_prompts[
+                                        f"memento_{dataset_name}_{response.get('sample_id', 'unknown')}"
+                                    ] = {
                                         "model": "memento",
                                         "dataset": dataset_name,
                                         "sample_id": response.get("sample_id", "unknown"),
                                         "evolved_prompt": evolved_prompt,
                                         "original_prompt": "You are a helpful assistant that solves problems step by step.",
-                                        "evaluation_metrics": response
+                                        "evaluation_metrics": response,
                                     }
-        
+
         # Save evolved prompts
         if evolved_prompts:
             prompts_file = self.output_dir / "evolved_prompts.json"
             with open(prompts_file, "w") as f:
                 json.dump(evolved_prompts, f, indent=2, default=str)
-            
+
             self.logger.info(f"Saved {len(evolved_prompts)} evolved prompts to {prompts_file}")
-            
+
             # Create a comparison report
             await self._create_prompt_comparison_report(evolved_prompts)
         else:
@@ -792,7 +800,7 @@ class ComprehensiveBenchmark(LoggerMixin):
     async def _create_prompt_comparison_report(self, evolved_prompts: Dict[str, Any]):
         """Create a comparison report for evolved prompts."""
         self.logger.info("Creating prompt comparison report")
-        
+
         report_content = """# Memento Prompt Evolution Report
 
 ## Overview
@@ -801,7 +809,7 @@ This report shows how Memento evolved system prompts during the benchmark evalua
 ## Evolved Prompts
 
 """
-        
+
         for prompt_id, prompt_data in evolved_prompts.items():
             report_content += f"""
 ### {prompt_id.replace('_', ' ').title()}
@@ -826,10 +834,10 @@ This report shows how Memento evolved system prompts during the benchmark evalua
 
 ---
 """
-        
+
         # Save the report
         report_file = self.output_dir / "prompt_evolution_report.md"
         with open(report_file, "w") as f:
             f.write(report_content)
-        
+
         self.logger.info(f"Saved prompt comparison report to {report_file}")

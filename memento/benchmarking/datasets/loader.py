@@ -175,7 +175,7 @@ class DatasetLoader:
         Returns:
             Loaded dataset
         """
-        dataset = datasets.load_dataset("openai/human-eval", split=split, use_auth_token=self.use_auth_token)
+        dataset = datasets.load_dataset("openai_humaneval", split=split, use_auth_token=self.use_auth_token)
         return dataset
 
     async def _load_gsm8k(self, split: Optional[str] = None, max_samples: Optional[int] = None, **kwargs) -> Dataset:
