@@ -3,7 +3,7 @@
 Integrated Benchmarking with Visualization Demo
 
 This script demonstrates the integrated benchmarking process that automatically
-generates professional visualizations as part of the benchmark execution.
+generates visualizations as part of the benchmark execution.
 """
 
 import asyncio

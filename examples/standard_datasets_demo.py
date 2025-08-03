@@ -2,7 +2,7 @@
 """
 Standard Datasets Demo
 
-Professional demonstration using established open-source datasets:
+Demonstration using established open-source datasets:
 - HumanEval for programming evaluation
 - MATH dataset for mathematical reasoning
 - BiGGen-Bench for creative writing assessment
@@ -10,7 +10,7 @@ Professional demonstration using established open-source datasets:
 This approach ensures:
 - Reproducibility and comparability with other research
 - Peer-reviewed quality and difficulty
-- Professional credibility and no contamination concerns
+- Credibility and no contamination concerns
 """
 
 import asyncio
@@ -21,7 +21,7 @@ from memento.datasets import StandardDatasetManager, StandardEvaluationRunner
 
 
 class Phase5StandardDemo:
-    """Professional demonstration using standard open-source datasets."""
+    """Demonstration using standard open-source datasets."""
 
     def __init__(self):
         """Initialize demo with standard datasets."""
@@ -34,10 +34,10 @@ class Phase5StandardDemo:
         self.evaluation_runner = StandardEvaluationRunner(self.dataset_manager)
 
     async def run_comprehensive_demo(self):
-        """Run complete Phase 5 demonstration with standard datasets."""
-        print("🎓 PHASE 5: PROFESSIONAL STANDARD DATASETS DEMO")
+        """Run complete demonstration with standard datasets."""
+        print("🎓 STANDARD DATASETS DEMO")
         print("=" * 60)
-        print("Using peer-reviewed, open-source datasets for professional evaluation")
+        print("Using peer-reviewed, open-source datasets for  evaluation")
         print()
 
         # 1. Show available standard datasets
@@ -52,10 +52,10 @@ class Phase5StandardDemo:
         # 4. Show professional benchmarking approach
         await self.demonstrate_benchmarking()
 
-        print("\n🏆 Professional Standard Datasets Demo Complete!")
+        print("\n🏆 Standard Datasets Demo Complete!")
         print("✅ Industry-standard datasets loaded and ready")
         print("✅ Reproducible evaluation framework established")
-        print("✅ Professional benchmarking methodology demonstrated")
+        print("✅ Benchmarking methodology demonstrated")
 
     async def demonstrate_available_datasets(self):
         """Show all available standard datasets."""
@@ -180,8 +180,8 @@ class Phase5StandardDemo:
                 print(f"  • {dataset}: {len(problems)} problems (mock)")
 
     async def demonstrate_benchmarking(self):
-        """Demonstrate professional benchmarking methodology."""
-        print("\n🏅 PROFESSIONAL BENCHMARKING METHODOLOGY")
+        """Demonstrate benchmarking methodology."""
+        print("\n🏅 BENCHMARKING METHODOLOGY")
         print("-" * 40)
 
         print("Demonstrating how to benchmark Memento against standard datasets...")
@@ -213,7 +213,7 @@ class Phase5StandardDemo:
                     else:
                         print(f"    {metric}: {value}")
 
-        print("\n🎯 PROFESSIONAL ADVANTAGES:")
+        print("\n🎯 ADVANTAGES:")
         print("  ✅ Reproducible: Results can be compared with other research")
         print("  ✅ Peer-reviewed: Datasets have been validated by the community")
         print("  ✅ Comprehensive: Covers multiple domains and difficulty levels")
@@ -235,11 +235,11 @@ class Phase5StandardDemo:
                 f"  {method:<20} {scores['humaneval']:>8.3f}  {scores['math_hard']:>8.3f}  {scores['writingbench']:>11.1f}"
             )
 
-        print("\n🏆 Memento shows superior performance across all standard benchmarks!")
+        print("\n🏆 Memento shows ??!")
 
 
 async def main():
-    """Run the Phase 5 standard datasets demonstration."""
+    """Run the standard datasets demonstration."""
     demo = Phase5StandardDemo()
     await demo.run_comprehensive_demo()
 

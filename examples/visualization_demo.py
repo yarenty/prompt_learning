@@ -20,7 +20,7 @@ from memento.benchmarking.visualization import ComparisonPlotter, ResultsVisuali
 
 
 class VisualizationDemo:
-    """Demonstration of professional visualization capabilities."""
+    """Demonstration of visualization capabilities."""
 
     def __init__(self):
         """Initialize the visualization demo."""
@@ -61,7 +61,7 @@ This demo showcases Memento's comprehensive visualization capabilities:
   • Dataset difficulty analysis
 
 All visualizations are designed for research publications and
-professional presentations with high-quality, publication-ready output.
+presentations with high-quality, publication-ready output.
         """
 
         self.console.print(

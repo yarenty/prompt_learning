@@ -2,14 +2,14 @@
 """
 Standard Benchmarking Framework Demo
 
-Professional demonstration of Memento's benchmarking capabilities using
+Demonstration of Memento's benchmarking capabilities using
 established open-source datasets:
 
 - HumanEval, BigCodeBench, APPS for programming evaluation
 - MATH, GSM8K for mathematical reasoning
 - BiGGen-Bench, WritingBench for creative writing assessment
 
-This ensures reproducible, peer-reviewed, and professionally credible evaluation.
+This ensures reproducible, peer-reviewed, and evaluation.
 """
 
 import asyncio
@@ -20,7 +20,7 @@ from memento.config import ModelConfig, ModelType
 
 
 class StandardBenchmarkingDemo:
-    """Comprehensive demonstration of professional benchmarking framework."""
+    """Comprehensive demonstration of benchmarking framework."""
 
     def __init__(self):
         """Initialize demo with standard benchmarking configuration."""
@@ -45,14 +45,14 @@ class StandardBenchmarkingDemo:
         )
 
     async def run_comprehensive_demo(self):
-        """Run complete professional benchmarking demonstration."""
-        print("🏆 PROFESSIONAL BENCHMARKING FRAMEWORK DEMO")
+        """Run complete benchmarking demonstration."""
+        print("🏆 BENCHMARKING FRAMEWORK DEMO")
         print("=" * 70)
         print("Using industry-standard, peer-reviewed datasets for evaluation")
         print()
 
-        # 1. Overview of professional approach
-        await self.demonstrate_professional_approach()
+        # 1. Overview of approach
+        await self.demonstrate_approach()
 
         # 2. Show standard datasets integration
         await self.demonstrate_standard_datasets()
@@ -63,15 +63,15 @@ class StandardBenchmarkingDemo:
         # 4. Show comparative analysis
         await self.demonstrate_comparative_analysis()
 
-        print("\n🎯 Professional Benchmarking Demo Complete!")
+        print("\n🎯 Benchmarking Demo Complete!")
         print("✅ Industry-standard evaluation completed")
         print("✅ Peer-reviewed datasets utilized")
         print("✅ Reproducible results generated")
-        print("✅ Professional credibility established")
+        print("✅ Credibility established")
 
-    async def demonstrate_professional_approach(self):
-        """Demonstrate the professional advantages of standard datasets."""
-        print("🎓 PROFESSIONAL BENCHMARKING APPROACH")
+    async def demonstrate_approach(self):
+        """Demonstrate the advantages of standard datasets."""
+        print("🎓 BENCHMARKING APPROACH")
         print("-" * 50)
 
         print("Why Standard Datasets Matter:")
@@ -225,7 +225,7 @@ class StandardBenchmarkingDemo:
         print("  ✅ Consistent across multiple domains")
         print("  ✅ Robust confidence intervals")
 
-        print("\n🏅 Professional Impact:")
+        print("\n🏅 Impact:")
         print("  ✅ Establishes new state-of-the-art performance")
         print("  ✅ Demonstrates consistent improvements across domains")
         print("  ✅ Provides reproducible and verifiable results")
