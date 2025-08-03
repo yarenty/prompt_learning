@@ -255,6 +255,33 @@ class ComprehensiveBenchmark(LoggerMixin):
         if self.dashboard:
             await self.dashboard.start()
 
+            # Initialize dashboard with starting data
+            self.dashboard.update_metric("progress", 0.0)
+            self.dashboard.update_metric("datasets_completed", 0)
+            self.dashboard.update_metric("total_datasets", len(datasets))
+            self.dashboard.update_metric("total_models", len(models))
+
+            # Start resource monitoring updates
+            if self.resource_monitor:
+                import asyncio
+
+                async def update_resources():
+                    while True:
+                        try:
+                            # Collect current resource metrics
+                            self.resource_monitor.collect_metrics()
+                            if self.resource_monitor.metrics:
+                                latest = self.resource_monitor.metrics[-1]
+                                self.dashboard.update_resource("cpu", latest.get("cpu_percent", 0))
+                                self.dashboard.update_resource("memory", latest.get("memory_percent", 0))
+                                self.dashboard.update_resource("memory_mb", latest.get("memory_rss", 0) / 1024 / 1024)
+                        except Exception as e:
+                            self.logger.warning(f"Failed to update resource metrics: {e}")
+                        await asyncio.sleep(1)  # Update every second
+
+                # Start resource monitoring task
+                asyncio.create_task(update_resources())
+
         try:
             # Initialize results structure
             results = {
@@ -288,10 +315,26 @@ class ComprehensiveBenchmark(LoggerMixin):
 
                     # Update dashboard if enabled
                     if self.dashboard:
+                        # Update progress metrics
+                        progress = len(results["dataset_results"]) / len(datasets) * 100
+                        self.dashboard.update_metric("progress", progress)
+
+                        # Update dataset completion
+                        self.dashboard.update_metric("datasets_completed", len(results["dataset_results"]))
+
+                        # Update model results
                         for model_name, model_results in dataset_results.items():
-                            self.dashboard.update_comparison(
-                                dataset_name, model_name, model_results.get("accuracy", 0.0)
-                            )
+                            if isinstance(model_results, dict):
+                                accuracy = model_results.get("accuracy", 0.0)
+                                latency = model_results.get("latency", 0.0)
+                                quality_score = model_results.get("quality_score", 0.0)
+
+                                self.dashboard.update_metric(f"{model_name}_accuracy", accuracy)
+                                self.dashboard.update_metric(f"{model_name}_latency", latency)
+                                self.dashboard.update_metric(f"{model_name}_quality", quality_score)
+
+                                # Update comparison data
+                                self.dashboard.update_comparison("accuracy", model_name, accuracy)
 
                 except Exception as e:
                     self.logger.error(f"Failed to evaluate dataset {dataset_name}: {e}")
