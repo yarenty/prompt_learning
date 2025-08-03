@@ -1,3 +1,4 @@
+
 # Python virtual environments
 venv/
 .venv/
@@ -61,3 +62,8 @@ Pipfile.lock
 
 # poetry
 poetry.lock 
+
+
+benchmark_results/
+integrated_benchmark_output/
+visualization_demo_output/

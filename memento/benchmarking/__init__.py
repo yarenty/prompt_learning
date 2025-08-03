@@ -24,10 +24,10 @@ from .baselines.self_evolving_gpt import SelfEvolvingGPT
 from .evaluation.benchmark_runner import StandardBenchmarkRunner
 from .evaluation.metrics import EvaluationMetrics
 from .evaluation.statistical_analyzer import StatisticalAnalyzer
+from .visualization.comparison_plotter import ComparisonPlotter
 
-# Visualization and reporting (TODO: Implement these modules)
-# from .visualization.results_visualizer import ResultsVisualizer
-# from .visualization.comparison_plotter import ComparisonPlotter
+# Visualization and reporting
+from .visualization.results_visualizer import ResultsVisualizer
 
 __all__ = [
     # Main benchmarking framework (RECOMMENDED)
@@ -38,7 +38,7 @@ __all__ = [
     "PromptBreeder",
     "SelfEvolvingGPT",
     "AutoEvolve",
-    # Visualization tools (TODO: Implement)
-    # "ResultsVisualizer",
-    # "ComparisonPlotter",
+    # Visualization tools
+    "ResultsVisualizer",
+    "ComparisonPlotter",
 ]
