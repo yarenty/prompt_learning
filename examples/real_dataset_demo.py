@@ -207,13 +207,37 @@ class RealDatasetDemo:
             if problems:
                 print(f"  📊 Loaded {len(problems)} problems for evaluation")
 
-                # Create mock responses (in real usage, these would come from models)
-                mock_responses = [
-                    "Let me solve this step by step. Janet has 16 eggs per day. She eats 3 for breakfast and uses 4 for muffins. So she sells 16 - 3 - 4 = 9 eggs. At $2 per egg, she makes 9 * 2 = $18 per day.",
-                    "This is a simple calculation problem. The answer is 42.",
-                ]
+                # Generate real responses using Ollama
+                import ollama
 
-                print(f"  🤖 Generated {len(mock_responses)} mock responses")
+                real_responses = []
+                for i, problem in enumerate(problems):
+                    try:
+                        question = problem.get("question", "")
+                        prompt = f"""Solve this math problem step by step:
+
+{question}
+
+Please provide a clear, step-by-step solution."""
+
+                        response = ollama.chat(
+                            model="llama3.2",
+                            messages=[{"role": "user", "content": prompt}],
+                            options={"temperature": 0.7, "num_predict": 500},
+                        )
+
+                        if response and "message" in response:
+                            real_responses.append(response["message"]["content"])
+                            print(f"  🤖 Generated real response {i+1}: {response['message']['content'][:100]}...")
+                        else:
+                            real_responses.append("Failed to generate response")
+                            print(f"  ❌ Failed to generate response {i+1}")
+
+                    except Exception as e:
+                        real_responses.append(f"Error: {e}")
+                        print(f"  ❌ Error generating response {i+1}: {e}")
+
+                print(f"  📈 Generated {len(real_responses)} real responses using Ollama")
                 print(f"  📈 Ready for evaluation with real problems and responses")
 
                 # Show what evaluation would look like

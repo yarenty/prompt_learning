@@ -139,6 +139,9 @@ class ComprehensiveBenchmark:
 
             results[model] = model_results
 
+            # Update dashboard if available (this will be called from the enhanced benchmark)
+            # The dashboard updates are handled in the comprehensive benchmark wrapper
+
         return results
 
     async def _evaluate_model(self, model: str, dataset: str, **kwargs) -> Dict[str, Any]:
@@ -152,11 +155,34 @@ class ComprehensiveBenchmark:
         Returns:
             Dictionary with evaluation results
         """
-        # TODO: Implement actual model evaluation
-        # This is a placeholder that returns random metrics
-        import numpy as np
+        # Real evaluation using the model evaluator
+        try:
+            from ..config.models import ModelConfig, ModelType
+            from .evaluation.model_evaluator import ModelEvaluator
+            from .datasets.loader import DatasetLoader
 
-        return {metric: float(np.random.normal(0.8, 0.1)) for metric in self.metrics}
+            # Create model config
+            model_config = ModelConfig(
+                model_type=ModelType.OLLAMA, model_name="llama3.2", temperature=0.7, max_tokens=2048
+            )
+
+            # Load dataset
+            dataset_loader = DatasetLoader()
+            dataset_data = await dataset_loader.load_dataset(dataset, max_samples=kwargs.get("max_samples", 10))
+
+            evaluator = ModelEvaluator(model_config)
+            results = await evaluator.evaluate_model(
+                model_name=model, dataset=dataset_data, dataset_name=dataset, max_samples=10  # Limit for speed
+            )
+
+            return {
+                "accuracy": results.get("basic_metrics", {}).get("accuracy", 0.0),
+                "latency": results.get("basic_metrics", {}).get("average_response_time", 0.0),
+                "quality_score": results.get("task_metrics", {}).get("overall_quality", 0.0),
+            }
+        except Exception as e:
+            logger.error(f"Real evaluation failed: {e}")
+            return {metric: 0.0 for metric in self.metrics}
 
     def _aggregate_model_results(self, model: str, dataset_results: Dict[str, Dict[str, Any]]) -> Dict[str, Any]:
         """Aggregate results for a model across datasets.
@@ -298,64 +324,119 @@ class ComprehensiveBenchmark:
         Args:
             results: Benchmark results
         """
-        # Generate results visualizations
-        for metric in self.metrics:
-            self.results_viz.plot_metric_history(results["dataset_results"], metric)
+        try:
+            # Convert results to visualization format with timestamps
+            from datetime import datetime
+            import pandas as pd
+            
+            # Create visualization data with timestamps
+            viz_data = []
+            timestamp = datetime.now()
+            
+            for dataset_name, dataset_results in results["dataset_results"].items():
+                for model_name, model_results in dataset_results.items():
+                    if isinstance(model_results, dict):
+                        for metric in self.metrics:
+                            if metric in model_results:
+                                value = model_results[metric]
+                                if isinstance(value, dict) and "mean" in value:
+                                    value = value["mean"]
+                                
+                                viz_data.append({
+                                    "timestamp": timestamp,
+                                    "dataset": dataset_name,
+                                    "model": model_name,
+                                    "metric": metric,
+                                    "value": value
+                                })
+            
+            # Generate results visualizations only if we have data
+            if viz_data:
+                for metric in self.metrics:
+                    metric_data = [d for d in viz_data if d["metric"] == metric]
+                    if metric_data:
+                        try:
+                            self.results_viz.plot_metric_history(metric_data, "value", group_by="model")
+                            self.results_viz.plot_metric_distribution(metric_data, "value", group_by="model")
+                        except Exception as e:
+                            logger.warning(f"Failed to generate visualization for {metric}: {e}")
 
-            self.results_viz.plot_metric_distribution(results["dataset_results"], metric)
+            # Generate comparison visualizations
+            if results["comparison_results"]:
+                for metric in self.metrics:
+                    try:
+                        self.comparison_viz.plot_method_comparison(
+                            results["dataset_results"], metric, baseline=results["metadata"]["baseline"]
+                        )
+                    except Exception as e:
+                        logger.warning(f"Failed to generate comparison for {metric}: {e}")
 
-        # Generate comparison visualizations
-        if results["comparison_results"]:
-            for metric in self.metrics:
-                self.comparison_viz.plot_method_comparison(
-                    results["dataset_results"], metric, baseline=results["metadata"]["baseline"]
-                )
+                for model in results["comparison_results"]:
+                    try:
+                        self.comparison_viz.plot_improvement_heatmap(
+                            results["dataset_results"][results["metadata"]["baseline"]], 
+                            results["dataset_results"][model]
+                        )
+                    except Exception as e:
+                        logger.warning(f"Failed to generate heatmap for {model}: {e}")
 
-            for model in results["comparison_results"]:
-                self.comparison_viz.plot_improvement_heatmap(
-                    results["dataset_results"][results["metadata"]["baseline"]], results["dataset_results"][model]
-                )
-
-        # Generate statistical visualizations
-        if results["comparison_results"]:
-            for metric in self.metrics:
-                data = {
-                    model: [
-                        results["dataset_results"][dataset][model][metric]
-                        for dataset in results["dataset_results"]
-                        if model in results["dataset_results"][dataset]
-                        and metric in results["dataset_results"][dataset][model]
-                    ]
-                    for model in results["metadata"]["models"]
-                }
-
-                self.stats_viz.plot_confidence_intervals(data)
-
-                if results["metadata"]["baseline"]:
-                    baseline = results["metadata"]["baseline"]
-                    baseline_data = {
-                        dataset: results["dataset_results"][dataset][baseline]
-                        for dataset in results["dataset_results"]
-                        if baseline in results["dataset_results"][dataset]
-                    }
-
-                    for model in results["metadata"]["models"]:
-                        if model != baseline:
-                            model_data = {
-                                dataset: results["dataset_results"][dataset][model]
+            # Generate statistical visualizations
+            if results["comparison_results"]:
+                for metric in self.metrics:
+                    try:
+                        data = {
+                            model: [
+                                results["dataset_results"][dataset][model][metric]
                                 for dataset in results["dataset_results"]
                                 if model in results["dataset_results"][dataset]
+                                and metric in results["dataset_results"][dataset][model]
+                            ]
+                            for model in results["metadata"]["models"]
+                        }
+
+                        self.stats_viz.plot_confidence_intervals(data)
+                    except Exception as e:
+                        logger.warning(f"Failed to generate confidence intervals for {metric}: {e}")
+
+                    if results["metadata"]["baseline"]:
+                        baseline = results["metadata"]["baseline"]
+                        try:
+                            baseline_data = {
+                                dataset: results["dataset_results"][dataset][baseline]
+                                for dataset in results["dataset_results"]
+                                if baseline in results["dataset_results"][dataset]
                             }
 
-                            self.stats_viz.plot_effect_sizes(baseline_data, model_data)
+                            for model in results["metadata"]["models"]:
+                                if model != baseline:
+                                    model_data = {
+                                        dataset: results["dataset_results"][dataset][model]
+                                        for dataset in results["dataset_results"]
+                                        if model in results["dataset_results"][dataset]
+                                    }
 
-        # Generate summary report
-        self.results_viz.generate_report(results["dataset_results"], self.metrics)
+                                    self.stats_viz.plot_effect_sizes(baseline_data, model_data)
+                        except Exception as e:
+                            logger.warning(f"Failed to generate effect sizes: {e}")
 
-        if results["comparison_results"]:
-            self.comparison_viz.create_comparison_report(
-                results["dataset_results"], results["metadata"]["baseline"], self.metrics
-            )
+            # Generate summary report
+            if viz_data:
+                try:
+                    self.results_viz.generate_report(viz_data, [d["metric"] for d in viz_data], group_by="model")
+                except Exception as e:
+                    logger.warning(f"Failed to generate summary report: {e}")
+
+            if results["comparison_results"]:
+                try:
+                    self.comparison_viz.create_comparison_report(
+                        results["dataset_results"], results["metadata"]["baseline"], self.metrics
+                    )
+                except Exception as e:
+                    logger.warning(f"Failed to generate comparison report: {e}")
+                    
+        except Exception as e:
+            logger.error(f"Failed to generate visualizations: {e}")
+            # Continue without visualizations rather than failing the entire benchmark
 
     def _save_results(self, results: Dict[str, Any]) -> None:
         """Save benchmark results.

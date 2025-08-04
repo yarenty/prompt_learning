@@ -161,13 +161,36 @@ class ModelEvaluator(LoggerMixin):
                 # Standardize sample format
                 if isinstance(item, dict):
                     # Handle different dataset formats
-                    problem = item.get("problem", item.get("description", item.get("text", item.get("question", ""))))
-                    expected = item.get("expected", item.get("solution", item.get("answer", "")))
+                    problem = item.get("prompt", item.get("problem", item.get("description", item.get("text", item.get("question", "")))))
+                    expected = item.get("canonical_solution", item.get("expected", item.get("solution", item.get("answer", ""))))
+
+                    # Ensure problem is not empty
+                    if not problem or not problem.strip():
+                        # Try to create a problem from other fields
+                        if "instruction" in item:
+                            problem = item["instruction"]
+                        elif "input" in item:
+                            problem = item["input"]
+                        elif "code" in item:
+                            problem = f"Write a function: {item['code']}"
+                        else:
+                            # Skip samples with no problem
+                            continue
+
+                    # For HumanEval, the prompt is the problem and canonical_solution is the expected
+                    if "prompt" in item and "canonical_solution" in item:
+                        problem = item["prompt"]
+                        expected = item["canonical_solution"]
+                    
+                    # For GSM8K, the question is the problem and answer is the expected
+                    elif "question" in item and "answer" in item:
+                        problem = item["question"]
+                        expected = item["answer"]
 
                     sample = {
                         "id": item.get("id", i),
-                        "problem": problem,
-                        "expected": expected,
+                        "problem": problem.strip(),
+                        "expected": expected.strip() if expected else "",
                         "metadata": {
                             k: v
                             for k, v in item.items()
@@ -181,13 +204,24 @@ class ModelEvaluator(LoggerMixin):
                                 "expected",
                                 "solution",
                                 "answer",
+                                "prompt",
+                                "instruction",
+                                "input",
+                                "canonical_solution",
+                                "code",
                             ]
                         },
                     }
                 else:
-                    sample = {"id": i, "problem": str(item), "expected": "", "metadata": {}}
+                    # Handle non-dict items
+                    problem = str(item).strip()
+                    if not problem:
+                        continue
+                    sample = {"id": i, "problem": problem, "expected": "", "metadata": {}}
 
-                samples.append(sample)
+                # Only add samples with valid problems
+                if sample["problem"] and sample["problem"].strip():
+                    samples.append(sample)
 
         return samples
 
@@ -262,8 +296,40 @@ class ModelEvaluator(LoggerMixin):
 
         # Create a simple evaluation function for PromptBreeder
         async def evaluation_function(prompt: str, problem_set: List[Dict[str, Any]]) -> float:
-            # Simple evaluation - in real implementation, this would be more sophisticated
-            return 0.8  # Placeholder score
+            # Real evaluation using the model
+            try:
+                import ollama
+
+                # Test the prompt on a sample problem
+                if problem_set:
+                    sample_problem = problem_set[0]
+                    test_prompt = f"{prompt}\n\nProblem: {sample_problem.get('problem', '')}\n\nSolution:"
+
+                    response = ollama.chat(
+                        model=self.model_config.model_name,
+                        messages=[{"role": "user", "content": test_prompt}],
+                        options={
+                            "temperature": self.model_config.temperature,
+                            "num_predict": self.model_config.max_tokens,
+                        },
+                    )
+
+                    if response and "message" in response:
+                        # Simple evaluation based on response length and content
+                        response_text = response["message"]["content"]
+                        if len(response_text) > 50 and any(
+                            word in response_text.lower() for word in ["step", "calculate", "solve", "answer"]
+                        ):
+                            return 0.8
+                        else:
+                            return 0.4
+                    else:
+                        return 0.2
+                else:
+                    return 0.5
+            except Exception as e:
+                self.logger.warning(f"Evaluation function failed: {e}")
+                return 0.3
 
         # Use PromptBreeder to evolve a prompt for this type of problem
         initial_prompt = f"Solve this problem step by step: {sample['problem']}"
@@ -284,7 +350,40 @@ class ModelEvaluator(LoggerMixin):
 
         # Create evaluation function
         async def evaluation_function(prompt: str, problem_set: List[Dict[str, Any]]) -> float:
-            return 0.8  # Placeholder score
+            # Real evaluation using the model
+            try:
+                import ollama
+
+                # Test the prompt on a sample problem
+                if problem_set:
+                    sample_problem = problem_set[0]
+                    test_prompt = f"{prompt}\n\nProblem: {sample_problem.get('problem', '')}\n\nSolution:"
+
+                    response = ollama.chat(
+                        model=self.model_config.model_name,
+                        messages=[{"role": "user", "content": test_prompt}],
+                        options={
+                            "temperature": self.model_config.temperature,
+                            "num_predict": self.model_config.max_tokens,
+                        },
+                    )
+
+                    if response and "message" in response:
+                        # Simple evaluation based on response length and content
+                        response_text = response["message"]["content"]
+                        if len(response_text) > 50 and any(
+                            word in response_text.lower() for word in ["step", "calculate", "solve", "answer"]
+                        ):
+                            return 0.8
+                        else:
+                            return 0.4
+                    else:
+                        return 0.2
+                else:
+                    return 0.5
+            except Exception as e:
+                self.logger.warning(f"Evaluation function failed: {e}")
+                return 0.3
 
         # Use SelfEvolvingGPT to generate and improve response
         initial_prompt = f"Solve this problem: {sample['problem']}"
@@ -302,7 +401,18 @@ class ModelEvaluator(LoggerMixin):
     async def _evaluate_with_memento(self, model: PromptLearner, sample: Dict[str, Any], **kwargs) -> str:
         """Evaluate sample with Memento."""
         # Use Memento's prompt evolution capabilities to evolve the system prompt
-        problem = {"description": sample["problem"], "solution": sample.get("expected", "")}
+        # Ensure we have a valid solution field
+        solution = sample.get("expected", "")
+        if not solution:
+            # For programming tasks, try to extract from test cases or create a placeholder
+            if "test_cases" in sample.get("metadata", {}):
+                test_cases = sample["metadata"]["test_cases"]
+                if test_cases and len(test_cases) > 0:
+                    solution = f"Expected output: {test_cases[0].get('expected', 'N/A')}"
+            else:
+                solution = "No expected solution provided"
+        
+        problem = {"description": sample["problem"], "solution": solution}
 
         # Create evaluation criteria for prompt evolution
         evaluation_criteria = ["correctness", "clarity", "readability"]
@@ -322,11 +432,8 @@ class ModelEvaluator(LoggerMixin):
 
             # Step 3: Evolve the prompt based on lessons
             current_prompt = "You are a helpful assistant that solves problems step by step."
-            evolved_prompt = await model.evolve_prompt(
-                current_prompt=current_prompt, 
-                lessons=lessons
-            )
-            
+            evolved_prompt = await model.evolve_prompt(current_prompt=current_prompt, lessons=lessons)
+
             self.logger.info(f"Evolved prompt for sample {sample['id']}")
 
             # Step 4: Save the evolved prompt for comparison
@@ -335,7 +442,7 @@ class ModelEvaluator(LoggerMixin):
                 prompt_type="system_prompt",
                 current_prompt=current_prompt,
                 updated_prompt=evolved_prompt,
-                evaluation_results=[evaluation_results]
+                evaluation_results=[evaluation_results],
             )
 
             # Step 5: Use the evolved prompt to generate a response
@@ -348,24 +455,21 @@ Please solve this problem step by step and provide the final answer."""
 
             # Generate response using the evolved prompt
             import ollama
-            
+
             model_name = self.model_config.model_name
             temperature = self.model_config.temperature
             max_tokens = self.model_config.max_tokens
-            
+
             response = ollama.chat(
                 model=model_name,
                 messages=[{"role": "user", "content": final_prompt}],
-                options={
-                    "temperature": temperature,
-                    "num_predict": max_tokens
-                }
+                options={"temperature": temperature, "num_predict": max_tokens},
             )
-            
+
             # Extract the response content
             if response and "message" in response:
                 generated_response = response["message"]["content"]
-                
+
                 # Return both the evolved prompt and the generated response
                 return f"""Evolved System Prompt:
 {evolved_prompt}
