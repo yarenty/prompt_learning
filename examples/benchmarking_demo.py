@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Memento Benchmarking Demo - Phase 4
+Memento Benchmarking Demo
 
 This demo showcases the comprehensive benchmarking framework that compares
 Memento against other prompt evolution methods:
