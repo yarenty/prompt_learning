@@ -283,6 +283,47 @@ class MetricsCollector(LoggerMixin):
         self.evaluation_metrics.clear()
         self.logger.info("Cleared all metrics")
 
+    def start_resource_monitoring(self) -> None:
+        """Start resource monitoring."""
+        try:
+            import psutil
+            self.monitoring_start_time = time.time()
+            self.monitoring_active = True
+            self.logger.info("Started resource monitoring")
+        except ImportError:
+            self.logger.warning("psutil not available, skipping resource monitoring")
+            self.monitoring_active = False
+
+    def stop_resource_monitoring(self) -> Dict[str, Any]:
+        """Stop resource monitoring and return collected metrics."""
+        if not hasattr(self, 'monitoring_active') or not self.monitoring_active:
+            return {}
+        
+        try:
+            import psutil
+            process = psutil.Process()
+            memory_info = process.memory_info()
+            cpu_percent = process.cpu_percent()
+            
+            monitoring_duration = time.time() - getattr(self, 'monitoring_start_time', time.time())
+            
+            resource_metrics = {
+                "peak_memory_mb": memory_info.rss / 1024 / 1024,
+                "avg_cpu_percent": cpu_percent,
+                "memory_usage_mb": memory_info.rss / 1024 / 1024,
+                "cpu_count": psutil.cpu_count(),
+                "available_memory_mb": psutil.virtual_memory().available / 1024 / 1024,
+                "monitoring_duration": monitoring_duration,
+            }
+            
+            self.monitoring_active = False
+            self.logger.info("Stopped resource monitoring")
+            return resource_metrics
+            
+        except ImportError:
+            self.logger.warning("psutil not available, resource monitoring not available")
+            return {}
+
 
 @contextmanager
 def timing_context(
