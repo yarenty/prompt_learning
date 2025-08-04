@@ -397,7 +397,7 @@ If you use Memento in your research, please cite our work:
 
 **BibTeX entry:**
 ```bibtex
-@misc{nowosad2024memento,
+@misc{nowosad2025memento,
   title={Memento: A Meta-Cognitive Framework for Self-Evolving System Prompts in AI Systems},
   author={Jaroslaw Nowosad},
   year={2025},
