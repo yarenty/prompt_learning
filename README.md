@@ -31,7 +31,6 @@ Memento incorporates meta-cognitive strategies, such as reflection, principle ex
 - [Development](#development)
 - [Research](#research)
 - [Citation](#citation)
-- [Contributing](#contributing)
 - [License](#license)
 
 ## 🚀 Installation
@@ -374,29 +373,13 @@ bandit -r memento/
 4. **Update documentation**
 5. **Submit pull request**
 
-## 📊 Research
 
-### Experimental Results
-
-Our evaluation across 450 tasks (150 each in software engineering, mathematics, and creative writing) demonstrates:
-
-- **15-25% improvement** in correctness scores
-- **20-30% improvement** in efficiency metrics
-- **Cross-domain transfer** of learned principles
-- **Convergence** to stable, high-performance prompts
-
-### Statistical Validation
-
-- **Statistical significance**: p < 0.05 for all comparisons
-- **Effect sizes**: Cohen's d > 0.5 for key metrics
-- **Confidence intervals**: 95% CI showing consistent improvements
 
 ### Research Paper
 
 For detailed methodology, results, and analysis, see our research paper:
 - **Title**: "Memento: A Meta-Cognitive Framework for Self-Evolving System Prompts in AI Systems"
 - **Authors**: Jaroslaw Nowosad
-- **Institution**: SNI Lab, Ireland Research Centre, Huawei
 
 ## 📚 Citation
 
